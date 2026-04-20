@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Registration — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --border: #e2ddd6; --border-focus: #ff5c1a;
+    --green: #1d6f42; --green-light: #e8f5ee;
+    --error: #dc2626; --error-light: #fef2f2;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  /* NAV */
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 5%; border-bottom: 1px solid var(--border);
+    background: rgba(245,242,235,0.95); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .nav-right { font-size: 0.88rem; color: var(--muted); }
+  .nav-right a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+  /* LAYOUT */
+  .page-wrap {
+    display: grid; grid-template-columns: 1fr 1.1fr;
+    min-height: calc(100vh - 65px);
+  }
+
+  /* LEFT PANEL */
+  .left-panel {
+    background: var(--ink); color: #fff;
+    padding: 60px 48px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    position: sticky; top: 65px; height: calc(100vh - 65px);
+    overflow: hidden;
+  }
+  .left-top {}
+  .left-tag {
+    display: inline-block; background: rgba(255,92,26,0.15); color: var(--accent);
+    font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase;
+    border-radius: 100px; padding: 5px 14px; margin-bottom: 28px;
+  }
+  .left-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+  .left-sub { font-size: 0.92rem; color: rgba(255,255,255,0.5); line-height: 1.7; font-weight: 300; max-width: 300px; }
+
+  .perks { display: flex; flex-direction: column; gap: 16px; margin-top: 48px; }
+  .perk { display: flex; align-items: flex-start; gap: 14px; }
+  .perk-icon { width: 36px; height: 36px; border-radius: 10px; background: rgba(255,255,255,0.07); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+  .perk-text { font-size: 0.88rem; color: rgba(255,255,255,0.75); line-height: 1.5; }
+  .perk-text b { color: #fff; font-weight: 500; display: block; margin-bottom: 2px; }
+
+  .left-bg-text {
+    position: absolute; bottom: -20px; right: -10px;
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 9rem; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+    user-select: none; pointer-events: none; line-height: 1;
+  }
+
+  .left-stats { display: flex; gap: 28px; }
+  .l-stat-num { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+  .l-stat-label { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  /* RIGHT PANEL — FORM */
+  .right-panel { padding: 56px 52px; }
+
+  /* PROGRESS */
+  .progress-wrap { margin-bottom: 40px; }
+  .progress-steps { display: flex; align-items: center; gap: 0; margin-bottom: 10px; }
+  .step-item { display: flex; align-items: center; flex: 1; }
+  .step-circle {
+    width: 32px; height: 32px; border-radius: 50%;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 500; color: var(--muted);
+    background: var(--surface); flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-circle.active { border-color: var(--accent); background: var(--accent); color: #fff; }
+  .step-circle.done { border-color: var(--green); background: var(--green); color: #fff; }
+  .step-line { flex: 1; height: 2px; background: var(--border); transition: background 0.3s; }
+  .step-line.done { background: var(--green); }
+  .step-labels { display: flex; justify-content: space-between; }
+  .step-label { font-size: 0.75rem; color: var(--muted); text-align: center; flex: 1; }
+  .step-label.active { color: var(--accent); font-weight: 500; }
+  .step-label.done { color: var(--green); }
+
+  /* FORM STEPS */
+  .form-step { display: none; animation: fadeIn 0.35s ease; }
+  .form-step.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+
+  .step-heading { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .step-subheading { font-size: 0.9rem; color: var(--muted); margin-bottom: 32px; font-weight: 300; }
+
+  /* FORM ELEMENTS */
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.83rem; font-weight: 500; color: var(--ink2); }
+  label span { color: var(--accent); }
+  input[type="text"], input[type="email"], input[type="tel"],
+  input[type="password"], input[type="url"], select, textarea {
+    width: 100%; padding: 11px 14px;
+    border: 1.5px solid var(--border); border-radius: 10px;
+    background: var(--surface); color: var(--ink);
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,92,26,0.08);
+  }
+  input.error { border-color: var(--error); background: var(--error-light); }
+  .error-msg { font-size: 0.78rem; color: var(--error); display: none; }
+  .error-msg.show { display: block; }
+  textarea { resize: vertical; min-height: 90px; }
+  select { cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+  /* SKILLS PICKER */
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+  .skill-tag {
+    padding: 7px 14px; border-radius: 100px;
+    border: 1.5px solid var(--border); background: var(--surface);
+    font-size: 0.82rem; font-weight: 400; color: var(--muted);
+    cursor: pointer; transition: all 0.18s; user-select: none;
+  }
+  .skill-tag:hover { border-color: var(--accent); color: var(--accent); }
+  .skill-tag.selected { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+  .skills-note { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+
+  /* FILE UPLOAD */
+  .file-upload {
+    border: 2px dashed var(--border); border-radius: 12px;
+    padding: 28px; text-align: center; cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    position: relative;
+  }
+  .file-upload:hover { border-color: var(--accent); background: var(--accent-light); }
+  .file-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .file-upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .file-upload-text { font-size: 0.88rem; color: var(--muted); }
+  .file-upload-text b { color: var(--accent); }
+  .file-name { font-size: 0.82rem; color: var(--green); margin-top: 8px; display: none; }
+
+  /* PASSWORD STRENGTH */
+  .pw-strength { margin-top: 6px; }
+  .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+  .pw-bar { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+  .pw-label { font-size: 0.75rem; color: var(--muted); }
+
+  /* CHECKBOX */
+  .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .checkbox-group input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent); flex-shrink: 0; cursor: pointer; }
+  .checkbox-group label { font-size: 0.85rem; color: var(--ink2); font-weight: 400; cursor: pointer; line-height: 1.5; }
+  .checkbox-group label a { color: var(--accent); text-decoration: none; }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; align-items: center; }
+  .btn-next {
+    background: var(--accent); color: #fff;
+    border: none; border-radius: 100px;
+    padding: 13px 32px; font-size: 0.92rem; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: transform 0.15s, box-shadow 0.15s; flex-shrink: 0;
+  }
+  .btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,92,26,0.3); }
+  .btn-back {
+    background: transparent; color: var(--muted);
+    border: 1.5px solid var(--border); border-radius: 100px;
+    padding: 12px 24px; font-size: 0.92rem; font-weight: 400;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: border-color 0.2s, color 0.2s;
+  }
+  .btn-back:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-skip { font-size: 0.82rem; color: var(--muted); background: none; border: none; cursor: pointer; margin-left: auto; font-family: 'DM Sans', sans-serif; }
+  .btn-skip:hover { color: var(--ink); }
+
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 40px 0; }
+  .success-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 24px; }
+  .success-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--ink); margin-bottom: 12px; }
+  .success-sub { font-size: 0.95rem; color: var(--muted); line-height: 1.7; font-weight: 300; margin-bottom: 32px; max-width: 380px; margin-left: auto; margin-right: auto; }
+  .success-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .btn-dashboard { background: var(--ink); color: #fff; border: none; border-radius: 100px; padding: 14px 36px; font-size: 0.95rem; font-weight: 500; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; transition: transform 0.15s; }
+  .btn-dashboard:hover { transform: scale(1.02); background: var(--accent); }
+  .confetti { display: flex; justify-content: center; gap: 6px; margin-bottom: 20px; }
+  .confetti span { width: 8px; height: 8px; border-radius: 2px; animation: confettiFall 1s ease both; }
+  @keyframes confettiFall { 0% { transform: translateY(-20px) rotate(0deg); opacity: 0; } 60% { opacity: 1; } 100% { transform: translateY(0) rotate(180deg); opacity: 1; } }
+
+  /* DIVIDER */
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .or-divider span { font-size: 0.8rem; color: var(--muted); }
+
+  /* SOCIAL LOGIN */
+  .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 10px; text-decoration: none; }
+  .social-btn:hover { border-color: var(--ink); background: var(--bg); }
+  .social-icon { width: 18px; height: 18px; }
+
+  /* TOOLTIP */
+  .field-hint { font-size: 0.77rem; color: var(--muted); margin-top: 4px; }
+
+  /* RESPONSIVE */
+  @media (max-width: 860px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 36px 24px; }
+    .form-row { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>Skill Linkr</a>
+  <div class="nav-right">Already have an account? <a href="login.html">Log in</a></div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div class="left-top">
+      <div class="left-tag">Student Registration</div>
+      <h2 class="left-title">Start earning with your college skills</h2>
+      <p class="left-sub">Join hundreds of students across India who are freelancing while studying.</p>
+
+      <div class="perks">
+        <div class="perk">
+          <div class="perk-icon">💼</div>
+          <div class="perk-text"><b>Real Projects</b>Work on actual briefs from startups & businesses</div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🔒</div>
+          <div class="perk-text"><b>Secure Payments</b>Escrow-protected — get paid after approval</div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">🎓</div>
+          <div class="perk-text"><b>Portfolio Builder</b>Every project adds to your verified portfolio</div>
+        </div>
+        <div class="perk">
+          <div class="perk-icon">📈</div>
+          <div class="perk-text"><b>Earn ₹500–₹15K</b>Per project, on your own schedule</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="left-stats">
+      <div>
+        <div class="l-stat-num">500+</div>
+        <div class="l-stat-label">Active Students</div>
+      </div>
+      <div>
+        <div class="l-stat-num">₹2L+</div>
+        <div class="l-stat-label">Earned So Far</div>
+      </div>
+      <div>
+        <div class="l-stat-num">120+</div>
+        <div class="l-stat-label">Projects Posted</div>
+      </div>
+    </div>
+    <div class="left-bg-text">JOIN</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- PROGRESS BAR -->
+    <div class="progress-wrap">
+      <div class="progress-steps" id="progressSteps">
+        <div class="step-item">
+          <div class="step-circle active" id="sc1">1</div>
+          <div class="step-line" id="sl1"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc2">2</div>
+          <div class="step-line" id="sl2"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc3">3</div>
+          <div class="step-line" id="sl3"></div>
+        </div>
+        <div class="step-item" style="flex:0;">
+          <div class="step-circle" id="sc4">4</div>
+        </div>
+      </div>
+      <div class="step-labels">
+        <span class="step-label active" id="sl-1">Basic Info</span>
+        <span class="step-label" id="sl-2">Education</span>
+        <span class="step-label" id="sl-3">Skills</span>
+        <span class="step-label" id="sl-4">Account</span>
+      </div>
+    </div>
+
+    <form id="regForm" novalidate>
+
+      <!-- STEP 1: Basic Info -->
+      <div class="form-step active" id="step1">
+        <h2 class="step-heading">Tell us about yourself</h2>
+        <p class="step-subheading">Basic personal details — takes 1 minute.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name <span>*</span></label>
+            <input type="text" id="firstName" placeholder="Rahul" />
+            <span class="error-msg" id="err-firstName">Please enter your first name</span>
+          </div>
+          <div class="form-group">
+            <label>Last Name <span>*</span></label>
+            <input type="text" id="lastName" placeholder="Sharma" />
+            <span class="error-msg" id="err-lastName">Please enter your last name</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Email Address <span>*</span></label>
+          <input type="email" id="email" placeholder="rahul@example.com" />
+          <span class="error-msg" id="err-email">Please enter a valid email</span>
+        </div>
+
+        <div class="form-group">
+          <label>Mobile Number <span>*</span></label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" maxlength="13" />
+          <span class="error-msg" id="err-phone">Please enter a valid 10-digit number</span>
+        </div>
+
+        <div class="form-group">
+          <label>City / State</label>
+          <input type="text" id="city" placeholder="Agra, Uttar Pradesh" />
+        </div>
+
+        <div class="or-divider"><span>or sign up with</span></div>
+        <a href="#" class="social-btn">
+          <svg class="social-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </a>
+
+        <div class="btn-row">
+          <button type="button" class="btn-next" onclick="nextStep(1)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Education -->
+      <div class="form-step" id="step2">
+        <h2 class="step-heading">Your education</h2>
+        <p class="step-subheading">Tell clients about your academic background.</p>
+
+        <div class="form-group">
+          <label>College / University <span>*</span></label>
+          <input type="text" id="college" placeholder="e.g. Agra College, AKTU" />
+          <span class="error-msg" id="err-college">Please enter your college name</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Degree / Programme <span>*</span></label>
+            <select id="degree">
+              <option value="">Select degree</option>
+              <option>B.Tech / B.E.</option>
+              <option>B.Sc</option>
+              <option>B.Com</option>
+              <option>BBA</option>
+              <option>B.Des</option>
+              <option>B.A.</option>
+              <option>MBA</option>
+              <option>M.Tech</option>
+              <option>MCA</option>
+              <option>Other</option>
+            </select>
+            <span class="error-msg" id="err-degree">Please select your degree</span>
+          </div>
+          <div class="form-group">
+            <label>Current Year <span>*</span></label>
+            <select id="year">
+              <option value="">Select year</option>
+              <option>1st Year</option>
+              <option>2nd Year</option>
+              <option>3rd Year</option>
+              <option>4th Year</option>
+              <option>Final Year</option>
+              <option>Postgraduate</option>
+            </select>
+            <span class="error-msg" id="err-year">Please select your year</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Specialisation / Branch</label>
+          <input type="text" id="branch" placeholder="e.g. Computer Science, Marketing" />
+        </div>
+
+        <div class="form-group">
+          <label>Graduation Year</label>
+          <select id="gradYear">
+            <option value="">Expected graduation</option>
+            <option>2025</option><option>2026</option><option>2027</option>
+            <option>2028</option><option>2029</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>College ID / Enrollment Number</label>
+          <input type="text" id="enrollNo" placeholder="For student verification" />
+          <p class="field-hint">Optional but helps verify faster and builds trust with clients.</p>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" onclick="prevStep(2)">← Back</button>
+          <button type="button" class="btn-next" onclick="nextStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Skills & Portfolio -->
+      <div class="form-step" id="step3">
+        <h2 class="step-heading">Your skills & portfolio</h2>
+        <p class="step-subheading">Select what you offer — clients will find you based on this.</p>
+
+        <div class="form-group">
+          <label>Skills <span>*</span></label>
+          <div class="skills-grid" id="skillsGrid">
+            <span class="skill-tag" onclick="toggleSkill(this)">Graphic Design</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Web Development</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Content Writing</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Video Editing</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Social Media</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">UI/UX Design</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Photography</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Data Entry</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Python / ML</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Android Dev</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">SEO / Marketing</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Translation</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Logo Design</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Excel / Sheets</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Voice Over</span>
+            <span class="skill-tag" onclick="toggleSkill(this)">Copywriting</span>
+          </div>
+          <p class="skills-note" id="skillsCount">Select at least 1 skill (0 selected)</p>
+          <span class="error-msg" id="err-skills">Please select at least one skill</span>
+        </div>
+
+        <div class="form-group">
+          <label>Bio / About You</label>
+          <textarea id="bio" placeholder="Tell clients a little about yourself, your experience, and what kind of projects you enjoy..."></textarea>
+          <p class="field-hint" id="bioCount">0 / 300 characters</p>
+        </div>
+
+        <div class="form-group">
+          <label>Portfolio / Work Samples URL</label>
+          <input type="url" id="portfolio" placeholder="https://behance.net/yourname or drive link" />
+        </div>
+
+        <div class="form-group">
+          <label>Upload Profile Photo</label>
+          <div class="file-upload" id="photoUpload">
+            <input type="file" accept="image/*" onchange="handleFile(this, 'photoName')" />
+            <div class="file-upload-icon">🖼️</div>
+            <div class="file-upload-text">Drag & drop or <b>browse</b> to upload<br><small style="color:var(--muted);font-size:0.76rem;">JPG, PNG up to 2MB</small></div>
+            <div class="file-name" id="photoName"></div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" onclick="prevStep(3)">← Back</button>
+          <button type="button" class="btn-next" onclick="nextStep(3)">Continue →</button>
+          <button type="button" class="btn-skip" onclick="nextStep(3, true)">Skip for now</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Account Setup -->
+      <div class="form-step" id="step4">
+        <h2 class="step-heading">Create your password</h2>
+        <p class="step-subheading">Almost there! Set a secure password for your account.</p>
+
+        <div class="form-group">
+          <label>Password <span>*</span></label>
+          <input type="password" id="password" placeholder="Min. 8 characters" oninput="checkPassword(this.value)" />
+          <div class="pw-strength">
+            <div class="pw-bars">
+              <div class="pw-bar" id="pwb1"></div>
+              <div class="pw-bar" id="pwb2"></div>
+              <div class="pw-bar" id="pwb3"></div>
+              <div class="pw-bar" id="pwb4"></div>
+            </div>
+            <div class="pw-label" id="pwLabel">Enter a password</div>
+          </div>
+          <span class="error-msg" id="err-password">Password must be at least 8 characters</span>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password <span>*</span></label>
+          <input type="password" id="confirmPw" placeholder="Repeat your password" />
+          <span class="error-msg" id="err-confirmPw">Passwords do not match</span>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <div class="checkbox-group">
+            <input type="checkbox" id="terms" />
+            <label for="terms">I agree to Skill Linkr's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+          </div>
+          <span class="error-msg" id="err-terms">You must accept the terms to continue</span>
+          <div class="checkbox-group">
+            <input type="checkbox" id="updates" checked />
+            <label for="updates">Send me project alerts and platform updates via email</label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" onclick="prevStep(4)">← Back</button>
+          <button type="button" class="btn-next" onclick="submitForm()" id="submitBtn">Create Account 🎉</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="form-step" id="step5">
+        <div class="success-screen">
+          <div class="confetti">
+            <span style="background:#ff5c1a;animation-delay:0s"></span>
+            <span style="background:#1d6f42;animation-delay:0.1s"></span>
+            <span style="background:#1a1a6e;animation-delay:0.2s"></span>
+            <span style="background:#ff5c1a;animation-delay:0.3s"></span>
+            <span style="background:#fbbf24;animation-delay:0.15s"></span>
+          </div>
+          <div class="success-icon">🎉</div>
+          <h2 class="success-title">Welcome to Skill Linkr!</h2>
+          <p class="success-sub">Your student profile is created. You can now browse projects, apply, and start earning — all while in college.</p>
+          <div class="success-actions">
+            <a href="dashboard-student.html" class="btn-dashboard">Go to My Dashboard →</a>
+            <a href="projects.html" style="font-size:.88rem;color:var(--accent);text-decoration:none;">Browse open projects →</a>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+  let selectedSkills = [];
+
+  function updateProgress(step) {
+    for (let i = 1; i <= totalSteps; i++) {
+      const circle = document.getElementById('sc' + i);
+      const label = document.getElementById('sl-' + i);
+      if (i < step) {
+        circle.className = 'step-circle done';
+        circle.textContent = '✓';
+        label.className = 'step-label done';
+      } else if (i === step) {
+        circle.className = 'step-circle active';
+        circle.textContent = i;
+        label.className = 'step-label active';
+      } else {
+        circle.className = 'step-circle';
+        circle.textContent = i;
+        label.className = 'step-label';
+      }
+      if (i < totalSteps) {
+        document.getElementById('sl' + i).className = i < step ? 'step-line done' : 'step-line';
+      }
+    }
+  }
+
+  function showStep(step) {
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + step).classList.add('active');
+    if (step <= totalSteps) updateProgress(step);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setError(fieldId, errId, show) {
+    const field = document.getElementById(fieldId);
+    const err = document.getElementById(errId);
+    if (show) {
+      if (field) field.classList.add('error');
+      if (err) err.classList.add('show');
+    } else {
+      if (field) field.classList.remove('error');
+      if (err) err.classList.remove('show');
+    }
+    return !show;
+  }
+
+  function validateStep(step) {
+    let valid = true;
+    if (step === 1) {
+      valid = setError('firstName', 'err-firstName', !document.getElementById('firstName').value.trim()) && valid;
+      valid = setError('lastName', 'err-lastName', !document.getElementById('lastName').value.trim()) && valid;
+      const email = document.getElementById('email').value;
+      valid = setError('email', 'err-email', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) && valid;
+      const phone = document.getElementById('phone').value.replace(/\D/g,'');
+      valid = setError('phone', 'err-phone', phone.length < 10) && valid;
+    } else if (step === 2) {
+      valid = setError('college', 'err-college', !document.getElementById('college').value.trim()) && valid;
+      valid = setError('degree', 'err-degree', !document.getElementById('degree').value) && valid;
+      valid = setError('year', 'err-year', !document.getElementById('year').value) && valid;
+    } else if (step === 3) {
+      const hasSkill = selectedSkills.length > 0;
+      setError(null, 'err-skills', !hasSkill);
+      if (!hasSkill) valid = false;
+    } else if (step === 4) {
+      const pw = document.getElementById('password').value;
+      valid = setError('password', 'err-password', pw.length < 8) && valid;
+      const cpw = document.getElementById('confirmPw').value;
+      valid = setError('confirmPw', 'err-confirmPw', pw !== cpw) && valid;
+      const terms = document.getElementById('terms').checked;
+      setError(null, 'err-terms', !terms);
+      if (!terms) valid = false;
+    }
+    return valid;
+  }
+
+  function nextStep(step, skip) {
+    if (!skip && !validateStep(step)) return;
+    currentStep = step + 1;
+    showStep(currentStep);
+  }
+
+  function prevStep(step) {
+    currentStep = step - 1;
+    showStep(currentStep);
+  }
+
+  function submitForm() {
+    if (!validateStep(4)) return;
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Creating account...';
+    btn.disabled = true;
+    setTimeout(() => {
+      document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step5').classList.add('active');
+      document.querySelector('.progress-wrap').style.display = 'none';
+    }, 1200);
+  }
+
+  function toggleSkill(el) {
+    el.classList.toggle('selected');
+    const skill = el.textContent;
+    if (el.classList.contains('selected')) {
+      selectedSkills.push(skill);
+    } else {
+      selectedSkills = selectedSkills.filter(s => s !== skill);
+    }
+    document.getElementById('skillsCount').textContent = `Select at least 1 skill (${selectedSkills.length} selected)`;
+    if (selectedSkills.length > 0) document.getElementById('err-skills').classList.remove('show');
+  }
+
+  function handleFile(input, nameId) {
+    if (input.files && input.files[0]) {
+      const nameEl = document.getElementById(nameId);
+      nameEl.textContent = '✓ ' + input.files[0].name;
+      nameEl.style.display = 'block';
+    }
+  }
+
+  function checkPassword(val) {
+    const bars = [document.getElementById('pwb1'), document.getElementById('pwb2'), document.getElementById('pwb3'), document.getElementById('pwb4')];
+    const label = document.getElementById('pwLabel');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const colors = ['#ef4444','#f97316','#eab308','#22c55e'];
+    const labels = ['Too weak','Fair','Good','Strong 💪'];
+    bars.forEach((b, i) => { b.style.background = i < score ? colors[score - 1] : 'var(--border)'; });
+    label.textContent = val.length === 0 ? 'Enter a password' : labels[score - 1] || 'Too weak';
+    label.style.color = val.length === 0 ? 'var(--muted)' : colors[score - 1];
+  }
+
+  document.getElementById('bio').addEventListener('input', function() {
+    const len = this.value.length;
+    if (len > 300) this.value = this.value.slice(0, 300);
+    document.getElementById('bioCount').textContent = Math.min(len, 300) + ' / 300 characters';
+  });
+
+  ['firstName','lastName','email','phone','college','degree','year','password','confirmPw'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => { el.classList.remove('error'); const err = document.getElementById('err-' + id); if(err) err.classList.remove('show'); });
+  });
+</script>
+</body>
+</html>

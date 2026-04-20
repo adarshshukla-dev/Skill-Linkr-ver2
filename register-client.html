@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Client Registration — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --accent2: #1a1a6e; --accent2-light: #eeeeff;
+    --border: #e2ddd6; --green: #1d6f42; --green-light: #e8f5ee;
+    --error: #dc2626; --error-light: #fef2f2;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 5%; border-bottom: 1px solid var(--border);
+    background: rgba(245,242,235,0.95); backdrop-filter: blur(10px);
+    position: sticky; top: 0; z-index: 50;
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .nav-right { font-size: 0.88rem; color: var(--muted); }
+  .nav-right a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+  .page-wrap { display: grid; grid-template-columns: 1fr 1.15fr; min-height: calc(100vh - 65px); }
+
+  /* LEFT */
+  .left-panel {
+    background: var(--accent2); color: #fff;
+    padding: 60px 48px; display: flex; flex-direction: column;
+    justify-content: space-between; position: sticky; top: 65px;
+    height: calc(100vh - 65px); overflow: hidden;
+  }
+  .left-tag { display: inline-block; background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 100px; padding: 5px 14px; margin-bottom: 28px; width: fit-content; }
+  .left-title { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; line-height: 1.2; margin-bottom: 14px; }
+  .left-sub { font-size: 0.92rem; color: rgba(255,255,255,0.5); line-height: 1.7; font-weight: 300; max-width: 300px; margin-bottom: 40px; }
+
+  .why-list { display: flex; flex-direction: column; gap: 18px; }
+  .why-item { display: flex; align-items: flex-start; gap: 14px; }
+  .why-icon { width: 40px; height: 40px; border-radius: 12px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .why-text b { display: block; font-size: 0.9rem; font-weight: 500; color: #fff; margin-bottom: 2px; }
+  .why-text span { font-size: 0.82rem; color: rgba(255,255,255,0.5); font-weight: 300; line-height: 1.5; }
+
+  .trust-strip { display: flex; gap: 0; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 28px; }
+  .trust-item { flex: 1; }
+  .trust-num { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: #fff; }
+  .trust-label { font-size: 0.76rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  .left-bg { position: absolute; bottom: -30px; right: -20px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 10rem; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.05); user-select: none; pointer-events: none; line-height: 1; }
+
+  /* RIGHT */
+  .right-panel { padding: 52px 56px; }
+
+  /* PROGRESS */
+  .progress-wrap { margin-bottom: 40px; }
+  .progress-steps { display: flex; align-items: center; margin-bottom: 10px; }
+  .step-item { display: flex; align-items: center; flex: 1; }
+  .step-circle { width: 32px; height: 32px; border-radius: 50%; border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 500; color: var(--muted); background: var(--surface); flex-shrink: 0; transition: all 0.3s; }
+  .step-circle.active { border-color: var(--accent2); background: var(--accent2); color: #fff; }
+  .step-circle.done { border-color: var(--green); background: var(--green); color: #fff; }
+  .step-line { flex: 1; height: 2px; background: var(--border); transition: background 0.3s; }
+  .step-line.done { background: var(--green); }
+  .step-labels { display: flex; justify-content: space-between; }
+  .step-label { font-size: 0.75rem; color: var(--muted); text-align: center; flex: 1; }
+  .step-label.active { color: var(--accent2); font-weight: 500; }
+  .step-label.done { color: var(--green); }
+
+  /* FORM STEPS */
+  .form-step { display: none; animation: fadeIn 0.3s ease; }
+  .form-step.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: translateX(0); } }
+
+  .step-heading { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--ink); margin-bottom: 6px; }
+  .step-subheading { font-size: 0.9rem; color: var(--muted); margin-bottom: 30px; font-weight: 300; }
+
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 0; }
+  .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.83rem; font-weight: 500; color: var(--ink2); }
+  label .req { color: var(--accent); }
+  label .opt { font-size: 0.75rem; color: var(--muted); font-weight: 400; }
+
+  input[type="text"], input[type="email"], input[type="tel"],
+  input[type="password"], input[type="url"], input[type="number"],
+  select, textarea {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; background: var(--surface); color: var(--ink);
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent2); box-shadow: 0 0 0 3px rgba(26,26,110,0.07); }
+  input.err, select.err { border-color: var(--error); background: var(--error-light); }
+  .err-msg { font-size: 0.78rem; color: var(--error); display: none; }
+  .err-msg.show { display: block; }
+  .field-hint { font-size: 0.77rem; color: var(--muted); margin-top: 3px; }
+  textarea { resize: vertical; min-height: 80px; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+
+  /* LOGO UPLOAD */
+  .file-upload { border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; position: relative; }
+  .file-upload:hover { border-color: var(--accent2); background: var(--accent2-light); }
+  .file-upload input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .file-upload-icon { font-size: 1.6rem; margin-bottom: 6px; }
+  .file-upload-text { font-size: 0.85rem; color: var(--muted); }
+  .file-upload-text b { color: var(--accent2); }
+  .file-name { font-size: 0.82rem; color: var(--green); margin-top: 6px; display: none; }
+
+  /* PROJECT TYPE CARDS */
+  .type-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 4px; }
+  .type-card { border: 1.5px solid var(--border); border-radius: 12px; padding: 14px 12px; text-align: center; cursor: pointer; transition: all 0.2s; background: var(--surface); }
+  .type-card:hover { border-color: var(--accent2); }
+  .type-card.selected { border-color: var(--accent2); background: var(--accent2-light); }
+  .type-card .type-icon { font-size: 1.4rem; margin-bottom: 6px; }
+  .type-card .type-label { font-size: 0.8rem; font-weight: 500; color: var(--ink2); }
+  .type-card.selected .type-label { color: var(--accent2); }
+
+  /* BUDGET SLIDER */
+  .budget-display { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent2); margin-bottom: 8px; }
+  input[type="range"] { width: 100%; accent-color: var(--accent2); height: 4px; cursor: pointer; }
+  .budget-labels { display: flex; justify-content: space-between; font-size: 0.75rem; color: var(--muted); margin-top: 4px; }
+
+  /* PASSWORD */
+  .input-wrap { position: relative; }
+  .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--muted); }
+  .pw-bars { display: flex; gap: 4px; margin-top: 6px; }
+  .pw-bar { height: 3px; flex: 1; border-radius: 2px; background: var(--border); transition: background 0.3s; }
+  .pw-label { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+
+  /* CHECKBOX */
+  .checkbox-group { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+  .checkbox-group input[type="checkbox"] { width: 16px; height: 16px; margin-top: 2px; accent-color: var(--accent2); flex-shrink: 0; cursor: pointer; }
+  .checkbox-group label { font-size: 0.85rem; color: var(--ink2); font-weight: 400; cursor: pointer; line-height: 1.5; }
+  .checkbox-group label a { color: var(--accent); text-decoration: none; }
+
+  /* BUTTONS */
+  .btn-row { display: flex; gap: 12px; margin-top: 28px; align-items: center; }
+  .btn-next { background: var(--accent2); color: #fff; border: none; border-radius: 100px; padding: 13px 32px; font-size: 0.92rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: transform 0.15s, box-shadow 0.15s; }
+  .btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(26,26,110,0.25); }
+  .btn-back { background: transparent; color: var(--muted); border: 1.5px solid var(--border); border-radius: 100px; padding: 12px 24px; font-size: 0.92rem; font-weight: 400; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s, color 0.2s; }
+  .btn-back:hover { border-color: var(--ink); color: var(--ink); }
+  .btn-skip { font-size: 0.82rem; color: var(--muted); background: none; border: none; cursor: pointer; margin-left: auto; font-family: 'DM Sans', sans-serif; }
+  .btn-skip:hover { color: var(--ink); }
+
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .or-divider span { font-size: 0.78rem; color: var(--muted); }
+  .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color 0.2s; text-decoration: none; }
+  .social-btn:hover { border-color: var(--ink); }
+  .g-icon { width: 18px; height: 18px; }
+
+  /* SUCCESS */
+  .success-screen { text-align: center; padding: 32px 0; }
+  .confetti-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 16px; }
+  .confetti-row span { width: 8px; height: 8px; border-radius: 2px; animation: cfall 0.9s ease both; }
+  @keyframes cfall { from { transform: translateY(-20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .s-icon { width: 72px; height: 72px; border-radius: 50%; background: var(--accent2-light); display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 20px; }
+  .s-title { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--ink); margin-bottom: 10px; }
+  .s-sub { font-size: 0.92rem; color: var(--muted); line-height: 1.7; font-weight: 300; max-width: 380px; margin: 0 auto 28px; }
+  .s-actions { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .btn-dashboard { background: var(--accent2); color: #fff; border: none; border-radius: 100px; padding: 14px 36px; font-size: 0.95rem; font-weight: 500; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; transition: transform 0.15s; }
+  .btn-dashboard:hover { transform: scale(1.02); background: var(--accent); }
+  .s-link { font-size: 0.88rem; color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 860px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 36px 24px; }
+    .form-row { grid-template-columns: 1fr; }
+    .type-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>Skill Linkr</a>
+  <div class="nav-right">Already registered? <a href="login.html">Log in</a></div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT PANEL -->
+  <div class="left-panel">
+    <div>
+      <div class="left-tag">Client Registration</div>
+      <h2 class="left-title">Hire India's brightest student talent</h2>
+      <p class="left-sub">Post a project in minutes and get quality work done — at startup-friendly prices.</p>
+
+      <div class="why-list">
+        <div class="why-item">
+          <div class="why-icon">⚡</div>
+          <div class="why-text">
+            <b>Post in 5 minutes</b>
+            <span>Simple brief form, students apply within hours</span>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">🎓</div>
+          <div class="why-text">
+            <b>Verified student talent</b>
+            <span>Every student profile is college-verified</span>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">🔒</div>
+          <div class="why-text">
+            <b>Pay only on satisfaction</b>
+            <span>Escrow holds payment until you approve the work</span>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-icon">💰</div>
+          <div class="why-text">
+            <b>60% cheaper than agencies</b>
+            <span>Quality work at a fraction of the cost</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="trust-strip">
+      <div class="trust-item"><div class="trust-num">50+</div><div class="trust-label">Partner Clients</div></div>
+      <div class="trust-item"><div class="trust-num">120+</div><div class="trust-label">Projects Done</div></div>
+      <div class="trust-item"><div class="trust-num">4.8★</div><div class="trust-label">Avg. Rating</div></div>
+    </div>
+    <div class="left-bg">HIRE</div>
+  </div>
+
+  <!-- RIGHT PANEL -->
+  <div class="right-panel">
+
+    <!-- PROGRESS -->
+    <div class="progress-wrap" id="progressWrap">
+      <div class="progress-steps">
+        <div class="step-item">
+          <div class="step-circle active" id="sc1">1</div>
+          <div class="step-line" id="sl1"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc2">2</div>
+          <div class="step-line" id="sl2"></div>
+        </div>
+        <div class="step-item">
+          <div class="step-circle" id="sc3">3</div>
+          <div class="step-line" id="sl3"></div>
+        </div>
+        <div class="step-item" style="flex:0;">
+          <div class="step-circle" id="sc4">4</div>
+        </div>
+      </div>
+      <div class="step-labels">
+        <span class="step-label active" id="sl-1">Your Details</span>
+        <span class="step-label" id="sl-2">Business Info</span>
+        <span class="step-label" id="sl-3">Project Needs</span>
+        <span class="step-label" id="sl-4">Account</span>
+      </div>
+    </div>
+
+    <form id="regForm" novalidate>
+
+      <!-- STEP 1: Personal Details -->
+      <div class="form-step active" id="step1">
+        <h2 class="step-heading">Let's start with you</h2>
+        <p class="step-subheading">Tell us who you are — takes less than a minute.</p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name <span class="req">*</span></label>
+            <input type="text" id="firstName" placeholder="Amit" />
+            <span class="err-msg" id="e-firstName">Please enter your first name</span>
+          </div>
+          <div class="form-group">
+            <label>Last Name <span class="req">*</span></label>
+            <input type="text" id="lastName" placeholder="Gupta" />
+            <span class="err-msg" id="e-lastName">Please enter your last name</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Work Email <span class="req">*</span></label>
+          <input type="email" id="email" placeholder="amit@yourcompany.com" />
+          <span class="err-msg" id="e-email">Please enter a valid email</span>
+        </div>
+
+        <div class="form-group">
+          <label>Mobile Number <span class="req">*</span></label>
+          <input type="tel" id="phone" placeholder="+91 98765 43210" maxlength="13"/>
+          <span class="err-msg" id="e-phone">Please enter a valid 10-digit number</span>
+        </div>
+
+        <div class="form-group">
+          <label>Your Role / Designation <span class="req">*</span></label>
+          <select id="designation">
+            <option value="">Select your role</option>
+            <option>Founder / Co-Founder</option>
+            <option>CEO / Director</option>
+            <option>Product Manager</option>
+            <option>Marketing Manager</option>
+            <option>HR / Recruiter</option>
+            <option>Freelance Client</option>
+            <option>Other</option>
+          </select>
+          <span class="err-msg" id="e-designation">Please select your role</span>
+        </div>
+
+        <div class="or-divider"><span>or sign up with</span></div>
+        <a href="#" class="social-btn">
+          <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </a>
+
+        <div class="btn-row">
+          <button type="button" class="btn-next" onclick="nextStep(1)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 2: Business Info -->
+      <div class="form-step" id="step2">
+        <h2 class="step-heading">About your business</h2>
+        <p class="step-subheading">Helps students understand who they're working with.</p>
+
+        <div class="form-group">
+          <label>Company / Business Name <span class="req">*</span></label>
+          <input type="text" id="company" placeholder="e.g. TechNova Solutions" />
+          <span class="err-msg" id="e-company">Please enter your company name</span>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Industry <span class="req">*</span></label>
+            <select id="industry">
+              <option value="">Select industry</option>
+              <option>Technology / SaaS</option>
+              <option>E-Commerce</option>
+              <option>Education / EdTech</option>
+              <option>Healthcare</option>
+              <option>Finance / FinTech</option>
+              <option>Media & Entertainment</option>
+              <option>Food & Hospitality</option>
+              <option>Real Estate</option>
+              <option>Fashion & Lifestyle</option>
+              <option>Manufacturing</option>
+              <option>NGO / Non-profit</option>
+              <option>Other</option>
+            </select>
+            <span class="err-msg" id="e-industry">Please select an industry</span>
+          </div>
+          <div class="form-group">
+            <label>Company Size</label>
+            <select id="companySize">
+              <option value="">Select size</option>
+              <option>Just me (Solo)</option>
+              <option>2–10 employees</option>
+              <option>11–50 employees</option>
+              <option>51–200 employees</option>
+              <option>200+ employees</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>City / Location <span class="req">*</span></label>
+          <input type="text" id="location" placeholder="e.g. Noida, Uttar Pradesh" />
+          <span class="err-msg" id="e-location">Please enter your location</span>
+        </div>
+
+        <div class="form-group">
+          <label>Website <span class="opt">(optional)</span></label>
+          <input type="url" id="website" placeholder="https://yourcompany.com" />
+        </div>
+
+        <div class="form-group">
+          <label>Company Logo <span class="opt">(optional)</span></label>
+          <div class="file-upload">
+            <input type="file" accept="image/*" onchange="handleFile(this,'logoName')" />
+            <div class="file-upload-icon">🏢</div>
+            <div class="file-upload-text">Drag & drop or <b>browse</b><br><small style="color:var(--muted);font-size:0.75rem;">PNG, JPG up to 2MB</small></div>
+            <div class="file-name" id="logoName"></div>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" onclick="prevStep(2)">← Back</button>
+          <button type="button" class="btn-next" onclick="nextStep(2)">Continue →</button>
+        </div>
+      </div>
+
+      <!-- STEP 3: Project Needs -->
+      <div class="form-step" id="step3">
+        <h2 class="step-heading">What do you need?</h2>
+        <p class="step-subheading">This helps us match you with the right students faster.</p>
+
+        <div class="form-group">
+          <label>What type of work do you usually need? <span class="req">*</span></label>
+          <div class="type-grid" id="typeGrid">
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">🎨</div><div class="type-label">Design</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">💻</div><div class="type-label">Development</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">✍️</div><div class="type-label">Content</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">📱</div><div class="type-label">Social Media</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">🎬</div><div class="type-label">Video / Photo</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">📊</div><div class="type-label">Data / Research</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">📣</div><div class="type-label">Marketing</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">🤖</div><div class="type-label">AI / ML</div></div>
+            <div class="type-card" onclick="toggleType(this)"><div class="type-icon">🌐</div><div class="type-label">Other</div></div>
+          </div>
+          <span class="err-msg" id="e-types">Please select at least one type</span>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <label>Typical Budget per Project</label>
+          <div class="budget-display" id="budgetDisplay">₹5,000</div>
+          <input type="range" min="500" max="50000" step="500" value="5000" id="budgetSlider" oninput="updateBudget(this.value)" />
+          <div class="budget-labels"><span>₹500</span><span>₹50,000+</span></div>
+        </div>
+
+        <div class="form-group">
+          <label>How soon do you typically need work done?</label>
+          <select id="timeline">
+            <option value="">Select timeline</option>
+            <option>Within 2 days</option>
+            <option>Within 1 week</option>
+            <option>1–2 weeks</option>
+            <option>2–4 weeks</option>
+            <option>Flexible / No rush</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Brief about what you're building / working on <span class="opt">(optional)</span></label>
+          <textarea id="brief" placeholder="e.g. We're a food delivery startup in Lucknow and need a student to help build our app UI and social media content..."></textarea>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" onclick="prevStep(3)">← Back</button>
+          <button type="button" class="btn-next" onclick="nextStep(3)">Continue →</button>
+          <button type="button" class="btn-skip" onclick="nextStep(3,true)">Skip for now</button>
+        </div>
+      </div>
+
+      <!-- STEP 4: Account -->
+      <div class="form-step" id="step4">
+        <h2 class="step-heading">Secure your account</h2>
+        <p class="step-subheading">Set a password to protect your client dashboard.</p>
+
+        <div class="form-group">
+          <label>Password <span class="req">*</span></label>
+          <div class="input-wrap">
+            <input type="password" id="password" placeholder="Min. 8 characters" oninput="checkPw(this.value)" />
+            <button type="button" class="pw-toggle" onclick="togglePw()">👁️</button>
+          </div>
+          <div class="pw-bars">
+            <div class="pw-bar" id="pb1"></div>
+            <div class="pw-bar" id="pb2"></div>
+            <div class="pw-bar" id="pb3"></div>
+            <div class="pw-bar" id="pb4"></div>
+          </div>
+          <div class="pw-label" id="pwLabel">Enter a password</div>
+          <span class="err-msg" id="e-password">Password must be at least 8 characters</span>
+        </div>
+
+        <div class="form-group">
+          <label>Confirm Password <span class="req">*</span></label>
+          <input type="password" id="confirmPw" placeholder="Repeat your password" />
+          <span class="err-msg" id="e-confirmPw">Passwords do not match</span>
+        </div>
+
+        <div class="form-group" style="margin-top:8px;">
+          <div class="checkbox-group">
+            <input type="checkbox" id="terms" />
+            <label for="terms">I agree to Skill Linkr's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></label>
+          </div>
+          <span class="err-msg" id="e-terms">Please accept the terms to continue</span>
+          <div class="checkbox-group">
+            <input type="checkbox" id="notify" checked />
+            <label for="notify">Notify me when students apply to my projects</label>
+          </div>
+          <div class="checkbox-group">
+            <input type="checkbox" id="marketing" />
+            <label for="marketing">Send me tips on getting the best results from student freelancers</label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button type="button" class="btn-back" onclick="prevStep(4)">← Back</button>
+          <button type="button" class="btn-next" onclick="submitForm()" id="submitBtn">Create Client Account 🚀</button>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="form-step" id="step5">
+        <div class="success-screen">
+          <div class="confetti-row">
+            <span style="background:#1a1a6e;animation-delay:0s"></span>
+            <span style="background:#ff5c1a;animation-delay:0.1s"></span>
+            <span style="background:#1d6f42;animation-delay:0.2s"></span>
+            <span style="background:#fbbf24;animation-delay:0.15s"></span>
+            <span style="background:#1a1a6e;animation-delay:0.05s"></span>
+          </div>
+          <div class="s-icon">🚀</div>
+          <h2 class="s-title">Account Created!</h2>
+          <p class="s-sub">Welcome to Skill Linkr! Your client account is ready. Post your first project and start receiving proposals from talented students across India.</p>
+          <div class="s-actions">
+            <a href="dashboard-client.html" class="btn-dashboard">Go to Dashboard →</a>
+            <a href="dashboard-client.html" class="s-link">Go to my dashboard</a>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script>
+  let currentStep = 1;
+  const totalSteps = 4;
+  let selectedTypes = [];
+  let pwVisible = false;
+
+  function updateProgress(step) {
+    for (let i = 1; i <= totalSteps; i++) {
+      const c = document.getElementById('sc' + i);
+      const l = document.getElementById('sl-' + i);
+      if (i < step) { c.className = 'step-circle done'; c.textContent = '✓'; l.className = 'step-label done'; }
+      else if (i === step) { c.className = 'step-circle active'; c.textContent = i; l.className = 'step-label active'; }
+      else { c.className = 'step-circle'; c.textContent = i; l.className = 'step-label'; }
+      if (i < totalSteps) document.getElementById('sl' + i).className = i < step ? 'step-line done' : 'step-line';
+    }
+  }
+
+  function showStep(n) {
+    document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+    document.getElementById('step' + n).classList.add('active');
+    if (n <= totalSteps) updateProgress(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function setErr(id, errId, bad) {
+    const el = document.getElementById(id);
+    const em = document.getElementById(errId);
+    if (bad) { if(el) el.classList.add('err'); if(em) em.classList.add('show'); }
+    else { if(el) el.classList.remove('err'); if(em) em.classList.remove('show'); }
+    return !bad;
+  }
+
+  function validateStep(step) {
+    let ok = true;
+    if (step === 1) {
+      ok = setErr('firstName','e-firstName', !document.getElementById('firstName').value.trim()) && ok;
+      ok = setErr('lastName','e-lastName', !document.getElementById('lastName').value.trim()) && ok;
+      const em = document.getElementById('email').value;
+      ok = setErr('email','e-email', !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) && ok;
+      const ph = document.getElementById('phone').value.replace(/\D/g,'');
+      ok = setErr('phone','e-phone', ph.length < 10) && ok;
+      ok = setErr('designation','e-designation', !document.getElementById('designation').value) && ok;
+    } else if (step === 2) {
+      ok = setErr('company','e-company', !document.getElementById('company').value.trim()) && ok;
+      ok = setErr('industry','e-industry', !document.getElementById('industry').value) && ok;
+      ok = setErr('location','e-location', !document.getElementById('location').value.trim()) && ok;
+    } else if (step === 3) {
+      const hasType = selectedTypes.length > 0;
+      const em = document.getElementById('e-types');
+      if (!hasType) { em.classList.add('show'); ok = false; } else { em.classList.remove('show'); }
+    } else if (step === 4) {
+      const pw = document.getElementById('password').value;
+      ok = setErr('password','e-password', pw.length < 8) && ok;
+      const cpw = document.getElementById('confirmPw').value;
+      ok = setErr('confirmPw','e-confirmPw', pw !== cpw) && ok;
+      const terms = document.getElementById('terms').checked;
+      const te = document.getElementById('e-terms');
+      if (!terms) { te.classList.add('show'); ok = false; } else { te.classList.remove('show'); }
+    }
+    return ok;
+  }
+
+  function nextStep(step, skip) {
+    if (!skip && !validateStep(step)) return;
+    currentStep = step + 1;
+    showStep(currentStep);
+  }
+  function prevStep(step) { currentStep = step - 1; showStep(currentStep); }
+
+  function submitForm() {
+    if (!validateStep(4)) return;
+    const btn = document.getElementById('submitBtn');
+    btn.textContent = 'Creating account...'; btn.disabled = true;
+    setTimeout(() => {
+      document.querySelectorAll('.form-step').forEach(s => s.classList.remove('active'));
+      document.getElementById('step5').classList.add('active');
+      document.getElementById('progressWrap').style.display = 'none';
+    }, 1300);
+  }
+
+  function toggleType(el) {
+    el.classList.toggle('selected');
+    const t = el.querySelector('.type-label').textContent;
+    selectedTypes = el.classList.contains('selected')
+      ? [...selectedTypes, t]
+      : selectedTypes.filter(s => s !== t);
+    if (selectedTypes.length > 0) document.getElementById('e-types').classList.remove('show');
+  }
+
+  function updateBudget(val) {
+    const v = parseInt(val);
+    document.getElementById('budgetDisplay').textContent = v >= 50000 ? '₹50,000+' : '₹' + v.toLocaleString('en-IN');
+  }
+
+  function handleFile(input, nameId) {
+    if (input.files && input.files[0]) {
+      const el = document.getElementById(nameId);
+      el.textContent = '✓ ' + input.files[0].name; el.style.display = 'block';
+    }
+  }
+
+  function checkPw(val) {
+    const bars = ['pb1','pb2','pb3','pb4'].map(id => document.getElementById(id));
+    const label = document.getElementById('pwLabel');
+    let score = 0;
+    if (val.length >= 8) score++;
+    if (/[A-Z]/.test(val)) score++;
+    if (/[0-9]/.test(val)) score++;
+    if (/[^A-Za-z0-9]/.test(val)) score++;
+    const colors = ['#ef4444','#f97316','#eab308','#22c55e'];
+    const labels = ['Too weak','Fair','Good','Strong 💪'];
+    bars.forEach((b, i) => { b.style.background = i < score ? colors[score-1] : 'var(--border)'; });
+    label.textContent = val.length === 0 ? 'Enter a password' : (labels[score-1] || 'Too weak');
+    label.style.color = val.length === 0 ? 'var(--muted)' : colors[score-1];
+  }
+
+  function togglePw() {
+    pwVisible = !pwVisible;
+    document.getElementById('password').type = pwVisible ? 'text' : 'password';
+  }
+
+  ['firstName','lastName','email','phone','designation','company','industry','location','password','confirmPw'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('err');
+      const em = document.getElementById('e-' + id);
+      if (em) em.classList.remove('show');
+    });
+  });
+</script>
+</body>
+</html>
