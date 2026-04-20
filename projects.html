@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Browse Projects — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --accent2: #1a1a6e; --accent2-light: #eeeeff;
+    --border: #e2ddd6; --green: #1d6f42; --green-light: #e8f5ee;
+    --amber: #b45309; --amber-light: #fffbeb;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 5%; background: rgba(245,242,235,0.95);
+    backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+  .nav-links a { font-size: 0.88rem; font-weight: 500; color: var(--ink2); text-decoration: none; transition: color 0.2s; }
+  .nav-links a:hover, .nav-links a.active { color: var(--accent); }
+  .nav-actions { display: flex; gap: 10px; align-items: center; }
+  .btn-nav-outline { padding: 8px 18px; border: 1.5px solid var(--border); border-radius: 100px; font-size: 0.85rem; font-weight: 500; color: var(--ink); background: transparent; cursor: pointer; text-decoration: none; transition: border-color 0.2s; font-family: 'DM Sans', sans-serif; }
+  .btn-nav-outline:hover { border-color: var(--ink); }
+  .btn-nav-fill { padding: 8px 18px; border-radius: 100px; font-size: 0.85rem; font-weight: 500; color: #fff; background: var(--accent); border: none; cursor: pointer; text-decoration: none; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; }
+  .btn-nav-fill:hover { opacity: 0.88; }
+
+  /* HERO BANNER */
+  .page-hero {
+    background: var(--ink); color: #fff;
+    padding: 48px 5% 40px; position: relative; overflow: hidden;
+  }
+  .page-hero h1 { font-family: 'Syne', sans-serif; font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 800; margin-bottom: 8px; }
+  .page-hero p { font-size: 0.95rem; color: rgba(255,255,255,0.55); font-weight: 300; max-width: 460px; line-height: 1.6; }
+  .hero-stats { display: flex; gap: 28px; margin-top: 24px; flex-wrap: wrap; }
+  .h-stat { font-size: 0.85rem; color: rgba(255,255,255,0.5); }
+  .h-stat b { color: var(--accent); font-weight: 600; }
+  .hero-bg-txt { position: absolute; right: -1%; top: 50%; transform: translateY(-50%); font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(5rem, 14vw, 11rem); color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.05); user-select: none; pointer-events: none; line-height: 1; }
+
+  /* SEARCH BAR */
+  .search-wrap {
+    padding: 20px 5%; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 12px; align-items: center; flex-wrap: wrap;
+  }
+  .search-box {
+    flex: 1; min-width: 220px; display: flex; align-items: center;
+    background: var(--bg); border: 1.5px solid var(--border);
+    border-radius: 10px; padding: 10px 14px; gap: 10px;
+    transition: border-color 0.2s;
+  }
+  .search-box:focus-within { border-color: var(--accent); }
+  .search-box input { border: none; background: transparent; outline: none; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; color: var(--ink); flex: 1; }
+  .search-icon { color: var(--muted); font-size: 1rem; flex-shrink: 0; }
+  .filter-select { padding: 10px 36px 10px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); font-family: 'DM Sans', sans-serif; font-size: 0.88rem; color: var(--ink); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; transition: border-color 0.2s; }
+  .filter-select:focus { border-color: var(--accent); }
+  .btn-search { background: var(--accent); color: #fff; border: none; border-radius: 10px; padding: 10px 22px; font-size: 0.88rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: opacity 0.2s; }
+  .btn-search:hover { opacity: 0.88; }
+
+  /* TAGS / QUICK FILTERS */
+  .tag-filters {
+    padding: 14px 5%; background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .tag-label { font-size: 0.78rem; color: var(--muted); font-weight: 500; margin-right: 4px; }
+  .filter-tag { padding: 6px 14px; border-radius: 100px; border: 1.5px solid var(--border); background: transparent; font-size: 0.8rem; font-weight: 400; color: var(--muted); cursor: pointer; transition: all 0.18s; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+  .filter-tag:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-tag.active { background: var(--accent-light); border-color: var(--accent); color: var(--accent); font-weight: 500; }
+
+  /* MAIN LAYOUT */
+  .main-wrap { display: grid; grid-template-columns: 260px 1fr; gap: 0; min-height: calc(100vh - 250px); }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--surface); border-right: 1px solid var(--border);
+    padding: 28px 24px; position: sticky; top: 65px;
+    height: calc(100vh - 65px); overflow-y: auto;
+  }
+  .sidebar::-webkit-scrollbar { width: 4px; }
+  .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .sidebar-section { margin-bottom: 28px; }
+  .sidebar-title { font-size: 0.78rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 14px; }
+  .sidebar-option { display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background 0.15s; margin-bottom: 2px; }
+  .sidebar-option:hover { background: var(--bg); }
+  .sidebar-option.selected { background: var(--accent-light); }
+  .sidebar-option label { font-size: 0.87rem; color: var(--ink2); cursor: pointer; display: flex; align-items: center; gap: 8px; }
+  .sidebar-option.selected label { color: var(--accent); font-weight: 500; }
+  .sidebar-option input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+  .count-badge { font-size: 0.72rem; color: var(--muted); background: var(--bg); border-radius: 100px; padding: 1px 7px; }
+  .sidebar-option.selected .count-badge { background: rgba(255,92,26,0.12); color: var(--accent); }
+  .budget-range { display: flex; flex-direction: column; gap: 8px; }
+  .range-row { display: flex; gap: 8px; }
+  .range-input { flex: 1; padding: 8px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--ink); outline: none; background: var(--bg); }
+  .range-input:focus { border-color: var(--accent); }
+  .btn-apply { width: 100%; background: var(--ink); color: #fff; border: none; border-radius: 8px; padding: 9px; font-size: 0.85rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 4px; transition: background 0.2s; }
+  .btn-apply:hover { background: var(--accent); }
+  .btn-clear-all { width: 100%; background: transparent; color: var(--muted); border: 1.5px solid var(--border); border-radius: 8px; padding: 8px; font-size: 0.82rem; cursor: pointer; font-family: 'DM Sans', sans-serif; margin-top: 28px; transition: color 0.2s, border-color 0.2s; }
+  .btn-clear-all:hover { color: var(--error, #dc2626); border-color: var(--error, #dc2626); }
+
+  /* LISTINGS */
+  .listings-wrap { padding: 24px 28px; }
+  .listings-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .results-count { font-size: 0.88rem; color: var(--muted); }
+  .results-count b { color: var(--ink); }
+  .sort-row { display: flex; align-items: center; gap: 10px; }
+  .sort-label { font-size: 0.82rem; color: var(--muted); }
+  .sort-select { padding: 7px 32px 7px 12px; border: 1.5px solid var(--border); border-radius: 8px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; color: var(--ink); outline: none; cursor: pointer; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; }
+
+  /* PROJECT CARDS */
+  .projects-grid { display: flex; flex-direction: column; gap: 16px; }
+  .project-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px 26px;
+    transition: transform 0.18s, box-shadow 0.18s, border-color 0.18s;
+    cursor: pointer; position: relative;
+  }
+  .project-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.07); border-color: #d0ccc4; }
+  .project-card.featured { border-color: var(--accent); }
+  .featured-badge { position: absolute; top: -1px; right: 20px; background: var(--accent); color: #fff; font-size: 0.7rem; font-weight: 500; padding: 3px 12px; border-radius: 0 0 8px 8px; letter-spacing: 0.06em; }
+
+  .card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .card-left { flex: 1; }
+  .card-category { font-size: 0.75rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); margin-bottom: 6px; }
+  .card-title { font-family: 'Syne', sans-serif; font-size: 1.08rem; font-weight: 700; color: var(--ink); line-height: 1.3; margin-bottom: 4px; }
+  .card-company { font-size: 0.83rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .verified-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); display: inline-block; }
+
+  .card-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+  .bookmark-btn { background: none; border: none; cursor: pointer; font-size: 1.1rem; color: var(--muted); transition: color 0.2s; padding: 2px; }
+  .bookmark-btn:hover, .bookmark-btn.saved { color: var(--accent); }
+  .card-budget { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); white-space: nowrap; }
+  .card-budget span { font-size: 0.78rem; font-weight: 400; color: var(--muted); }
+
+  .card-desc { font-size: 0.88rem; color: var(--muted); line-height: 1.65; margin-bottom: 16px; font-weight: 300; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+
+  .card-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+  .skill-pill { font-size: 0.77rem; background: var(--bg); border: 1px solid var(--border); border-radius: 100px; padding: 4px 10px; color: var(--ink2); }
+
+  .card-bottom { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+  .card-meta { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .meta-item { display: flex; align-items: center; gap: 5px; font-size: 0.8rem; color: var(--muted); }
+  .meta-dot { width: 4px; height: 4px; border-radius: 50%; background: var(--border); }
+
+  .urgency-badge { font-size: 0.73rem; font-weight: 500; padding: 3px 10px; border-radius: 100px; }
+  .urgency-hot { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+  .urgency-new { background: var(--green-light); color: var(--green); border: 1px solid #86efac; }
+  .urgency-open { background: var(--accent2-light); color: var(--accent2); border: 1px solid #a5b4fc; }
+
+  .btn-apply-now { background: var(--accent); color: #fff; border: none; border-radius: 100px; padding: 9px 22px; font-size: 0.85rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: transform 0.15s, box-shadow 0.15s; white-space: nowrap; text-decoration: none; }
+  .btn-apply-now:hover { transform: scale(1.03); box-shadow: 0 4px 14px rgba(255,92,26,0.28); }
+
+  /* PAGINATION */
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; margin-top: 36px; padding-bottom: 48px; }
+  .page-btn { width: 36px; height: 36px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--ink); font-size: 0.85rem; cursor: pointer; display: flex; align-items: center; justify-content: center; font-family: 'DM Sans', sans-serif; transition: all 0.18s; }
+  .page-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .page-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .page-btn.disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 64px 24px; }
+  .empty-icon { font-size: 3rem; margin-bottom: 16px; }
+  .empty-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .empty-sub { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+  /* MODAL */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; display: none; align-items: flex-end; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  @media (min-width: 640px) { .modal-overlay { align-items: center; } }
+  .modal-box { background: var(--surface); border-radius: 20px 20px 0 0; width: 100%; max-width: 640px; max-height: 90vh; overflow-y: auto; padding: 32px; position: relative; animation: slideUp 0.3s ease; }
+  @media (min-width: 640px) { .modal-box { border-radius: 20px; animation: popIn 0.25s ease; } }
+  @keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  @keyframes popIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-close { position: absolute; top: 16px; right: 18px; font-size: 1.3rem; cursor: pointer; color: var(--muted); background: none; border: none; }
+  .modal-cat { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--accent); margin-bottom: 8px; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; line-height: 1.2; }
+  .modal-company { font-size: 0.85rem; color: var(--muted); margin-bottom: 20px; display: flex; align-items: center; gap: 6px; }
+  .modal-section-title { font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin: 20px 0 8px; }
+  .modal-desc { font-size: 0.92rem; color: var(--ink2); line-height: 1.75; font-weight: 300; }
+  .modal-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 12px 0; }
+  .modal-info-item { background: var(--bg); border-radius: 10px; padding: 12px 14px; }
+  .modal-info-label { font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; }
+  .modal-info-val { font-size: 0.9rem; font-weight: 500; color: var(--ink); }
+  .modal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0; }
+  .modal-actions { display: flex; gap: 12px; margin-top: 24px; }
+  .btn-modal-apply { flex: 1; background: var(--accent); color: #fff; border: none; border-radius: 100px; padding: 13px; font-size: 0.92rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; }
+  .btn-modal-apply:hover { opacity: 0.88; }
+  .btn-modal-save { padding: 12px 20px; border: 1.5px solid var(--border); border-radius: 100px; background: transparent; font-size: 0.88rem; font-weight: 500; color: var(--ink); cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s; }
+  .btn-modal-save:hover { border-color: var(--ink); }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .main-wrap { grid-template-columns: 1fr; }
+    .sidebar { display: none; }
+    .listings-wrap { padding: 16px 5%; }
+    .nav-links { display: none; }
+    .modal-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>Skill Linkr</a>
+  <ul class="nav-links">
+    <li><a href="projects.html" class="active">Browse Projects</a></li>
+    <li><a href="#">Freelancers</a></li>
+    <li><a href="index.html#pricing">Pricing</a></li>
+    <li><a href="aboutus.html">About</a></li>
+  </ul>
+  <div class="nav-actions">
+    <a href="login.html" class="btn-nav-outline">Log In</a>
+    <a href="login.html" class="btn-nav-outline" style="margin-right:4px">Log In</a><a href="register-student.html" class="btn-nav-fill">Join Free</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="page-hero">
+  <h1>Browse Open Projects</h1>
+  <p>Real work from startups and businesses across India. Apply, get hired, get paid.</p>
+  <div class="hero-stats">
+    <div class="h-stat"><b id="liveCount">120+</b> projects live</div>
+    <div class="h-stat"><b>50+</b> verified clients</div>
+    <div class="h-stat"><b>₹500–₹50K</b> per project</div>
+  </div>
+  <div class="hero-bg-txt">WORK</div>
+</div>
+
+<!-- SEARCH BAR -->
+<div class="search-wrap">
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" id="searchInput" placeholder="Search projects — e.g. logo design, React, content writing..." oninput="filterProjects()" />
+  </div>
+  <select class="filter-select" id="catFilter" onchange="filterProjects()">
+    <option value="">All Categories</option>
+    <option>Design</option>
+    <option>Development</option>
+    <option>Content Writing</option>
+    <option>Social Media</option>
+    <option>Video & Photo</option>
+    <option>Marketing</option>
+    <option>Data & Research</option>
+    <option>Other</option>
+  </select>
+  <select class="filter-select" id="budgetFilter" onchange="filterProjects()">
+    <option value="">Any Budget</option>
+    <option value="low">Under ₹2,000</option>
+    <option value="mid">₹2,000–₹8,000</option>
+    <option value="high">₹8,000–₹20,000</option>
+    <option value="premium">₹20,000+</option>
+  </select>
+  <button class="btn-search" onclick="filterProjects()">Search</button>
+</div>
+
+<!-- QUICK FILTER TAGS -->
+<div class="tag-filters">
+  <span class="tag-label">Quick:</span>
+  <button class="filter-tag active" onclick="quickFilter(this,'all')">All</button>
+  <button class="filter-tag" onclick="quickFilter(this,'new')">🟢 New Today</button>
+  <button class="filter-tag" onclick="quickFilter(this,'hot')">🔥 Urgent</button>
+  <button class="filter-tag" onclick="quickFilter(this,'Design')">🎨 Design</button>
+  <button class="filter-tag" onclick="quickFilter(this,'Development')">💻 Development</button>
+  <button class="filter-tag" onclick="quickFilter(this,'Content Writing')">✍️ Content</button>
+  <button class="filter-tag" onclick="quickFilter(this,'Social Media')">📱 Social Media</button>
+  <button class="filter-tag" onclick="quickFilter(this,'Marketing')">📣 Marketing</button>
+</div>
+
+<!-- MAIN -->
+<div class="main-wrap">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-title">Category</div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Design')">
+        <label><input type="checkbox" onchange="filterProjects()"> Design</label>
+        <span class="count-badge">28</span>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Development')">
+        <label><input type="checkbox" onchange="filterProjects()"> Development</label>
+        <span class="count-badge">34</span>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Content Writing')">
+        <label><input type="checkbox" onchange="filterProjects()"> Content Writing</label>
+        <span class="count-badge">19</span>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Social Media')">
+        <label><input type="checkbox" onchange="filterProjects()"> Social Media</label>
+        <span class="count-badge">14</span>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Marketing')">
+        <label><input type="checkbox" onchange="filterProjects()"> Marketing</label>
+        <span class="count-badge">11</span>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Video & Photo')">
+        <label><input type="checkbox" onchange="filterProjects()"> Video & Photo</label>
+        <span class="count-badge">9</span>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'Data & Research')">
+        <label><input type="checkbox" onchange="filterProjects()"> Data & Research</label>
+        <span class="count-badge">7</span>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Budget Range</div>
+      <div class="budget-range">
+        <div class="range-row">
+          <input class="range-input" type="number" id="minBudget" placeholder="Min ₹" min="0" />
+          <input class="range-input" type="number" id="maxBudget" placeholder="Max ₹" min="0" />
+        </div>
+        <button class="btn-apply" onclick="filterProjects()">Apply Filter</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Timeline</div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'urgent')">
+        <label><input type="checkbox"> Urgent (1–3 days)</label>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'week')">
+        <label><input type="checkbox"> Within a week</label>
+      </div>
+      <div class="sidebar-option" onclick="toggleSidebar(this,'flexible')">
+        <label><input type="checkbox"> Flexible</label>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-title">Location</div>
+      <div class="sidebar-option"><label><input type="checkbox"> Remote / Any</label></div>
+      <div class="sidebar-option"><label><input type="checkbox"> Uttar Pradesh</label></div>
+      <div class="sidebar-option"><label><input type="checkbox"> Delhi NCR</label></div>
+      <div class="sidebar-option"><label><input type="checkbox"> Mumbai</label></div>
+    </div>
+
+    <button class="btn-clear-all" onclick="clearAllFilters()">✕ Clear All Filters</button>
+  </aside>
+
+  <!-- LISTINGS -->
+  <div class="listings-wrap">
+    <div class="listings-header">
+      <div class="results-count">Showing <b id="resultsNum">12</b> projects</div>
+      <div class="sort-row">
+        <span class="sort-label">Sort by:</span>
+        <select class="sort-select" onchange="sortProjects(this.value)">
+          <option value="newest">Newest First</option>
+          <option value="budget-high">Budget: High → Low</option>
+          <option value="budget-low">Budget: Low → High</option>
+          <option value="deadline">Deadline Soon</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Cards rendered by JS -->
+    </div>
+
+    <div class="empty-state" id="emptyState" style="display:none;">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-title">No projects found</div>
+      <div class="empty-sub">Try adjusting your filters or search terms.<br>New projects are added daily!</div>
+    </div>
+
+    <div class="pagination" id="pagination"></div>
+  </div>
+</div>
+
+<!-- PROJECT DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal-box" id="modalBox">
+    <button class="modal-close" onclick="closeModalDirect()">✕</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+const allProjects = [
+  { id:1, featured:true, category:'Design', title:'Brand Identity Design for EdTech Startup', company:'LearnFast India', location:'Noida, UP', budget:8000, budgetLabel:'₹8,000', desc:'We need a complete brand identity — logo, color palette, typography guide, and basic brand book for our new EdTech platform targeting college students in tier-2 cities.', skills:['Illustrator','Branding','Logo Design','Figma'], deadline:'5 days', applicants:3, postedAgo:'2 hours ago', urgency:'new', remote:true },
+  { id:2, featured:false, category:'Development', title:'React.js Frontend for Food Delivery App', company:'QuickBite Agra', location:'Agra, UP', budget:15000, budgetLabel:'₹15,000', desc:'Looking for a skilled React developer to build the customer-facing frontend of our food delivery application. API is ready, you just need to integrate and build UI.', skills:['React.js','JavaScript','REST API','CSS'], deadline:'10 days', applicants:7, postedAgo:'5 hours ago', urgency:'open', remote:true },
+  { id:3, featured:false, category:'Content Writing', title:'10 SEO Blog Articles for Finance Website', company:'MoneyWise UP', location:'Remote', budget:3500, budgetLabel:'₹3,500', desc:'Need 10 well-researched SEO articles (800–1000 words each) on personal finance topics for Indian millennials. Topics will be provided. Fluent Hindi/English bilingual preferred.', skills:['SEO Writing','Research','Finance','Hindi/English'], deadline:'7 days', applicants:12, postedAgo:'1 day ago', urgency:'open', remote:true },
+  { id:4, featured:true, category:'Social Media', title:'Instagram & LinkedIn Content for 1 Month', company:'GrowthHub Lucknow', location:'Lucknow, UP', budget:5000, budgetLabel:'₹5,000', desc:'We need a creative student to handle our social media content for 1 month — 20 Instagram posts + 8 LinkedIn posts with captions, hashtags, and a content calendar.', skills:['Canva','Copywriting','Instagram','LinkedIn'], deadline:'3 days', applicants:2, postedAgo:'3 hours ago', urgency:'hot', remote:true },
+  { id:5, featured:false, category:'Video & Photo', title:'Product Photography — 30 Clothing Items', company:'Dhaga Fashion', location:'Agra, UP', budget:4500, budgetLabel:'₹4,500', desc:'Local clothing brand needs a photography student for a one-day product shoot. Studio will be provided. Need clean white background shots of 30 clothing items, edited and delivered.', skills:['Photography','Lightroom','Product Shoot'], deadline:'4 days', applicants:4, postedAgo:'6 hours ago', urgency:'new', remote:false },
+  { id:6, featured:false, category:'Development', title:'WordPress Website for NGO', company:'Jan Seva Foundation', location:'Remote', budget:6000, budgetLabel:'₹6,000', desc:'Small NGO needs a professional website built on WordPress. Should include home, about, projects, donation page, and contact. Clean and mobile-friendly design.', skills:['WordPress','Elementor','HTML/CSS','Web Design'], deadline:'12 days', applicants:5, postedAgo:'2 days ago', urgency:'open', remote:true },
+  { id:7, featured:false, category:'Marketing', title:'Google Ads Campaign Setup & Management', company:'DentCare Clinic Mathura', location:'Mathura, UP', budget:7000, budgetLabel:'₹7,000', desc:'Dental clinic looking for a marketing student to set up and run Google Ads for 1 month. Target audience is local — Mathura & Vrindavan. Budget for ads: ₹10,000 extra.', skills:['Google Ads','SEM','Analytics','Marketing'], deadline:'Ongoing', applicants:6, postedAgo:'1 day ago', urgency:'open', remote:true },
+  { id:8, featured:false, category:'Design', title:'UI/UX Design for Gym Management App', company:'FitLife Startups', location:'Remote', budget:12000, budgetLabel:'₹12,000', desc:'Need a UI/UX designer to create complete wireframes and high-fidelity designs for a gym management mobile app (iOS/Android). 15–20 screens. Figma preferred.', skills:['Figma','UI Design','Mobile Design','Prototyping'], deadline:'14 days', applicants:9, postedAgo:'3 days ago', urgency:'open', remote:true },
+  { id:9, featured:false, category:'Data & Research', title:'Market Research Report — EV Segment India', company:'GreenMobility Labs', location:'Remote', budget:4000, budgetLabel:'₹4,000', desc:'Startup needs a comprehensive market research report on the electric two-wheeler segment in Tier-2 Indian cities. 15–20 page report with data, graphs, and insights.', skills:['Research','Excel','Data Analysis','Report Writing'], deadline:'8 days', applicants:3, postedAgo:'4 days ago', urgency:'open', remote:true },
+  { id:10, featured:false, category:'Development', title:'Python Script for Automated WhatsApp Alerts', company:'RetailPro Solutions', location:'Remote', budget:2500, budgetLabel:'₹2,500', desc:'Small business needs a Python script to send automated WhatsApp messages for order confirmations and delivery updates using Twilio or similar API.', skills:['Python','Twilio API','Automation'], deadline:'5 days', applicants:8, postedAgo:'1 day ago', urgency:'hot', remote:true },
+  { id:11, featured:false, category:'Content Writing', title:'Product Descriptions for 50 E-commerce Items', company:'DesiKart Store', location:'Remote', budget:2000, budgetLabel:'₹2,000', desc:'Online store needs compelling product descriptions (100–150 words each) for 50 products in the home decor category. Conversational and SEO-friendly tone.', skills:['Copywriting','E-commerce','SEO','English'], deadline:'6 days', applicants:15, postedAgo:'2 days ago', urgency:'open', remote:true },
+  { id:12, featured:false, category:'Design', title:'Logo & Business Card Design for CA Firm', company:'Agrawal & Associates', location:'Agra, UP', budget:1800, budgetLabel:'₹1,800', desc:'Chartered accountancy firm looking for a clean and professional logo with complementary business card design. Prefer minimal, corporate aesthetic. 3 concepts expected.', skills:['Logo Design','Illustrator','Print Design','Branding'], deadline:'4 days', applicants:6, postedAgo:'3 days ago', urgency:'open', remote:true },
+];
+
+let filtered = [...allProjects];
+let activeQuickFilter = 'all';
+let savedProjects = new Set();
+const PER_PAGE = 8;
+let currentPage = 1;
+
+function renderCards(list) {
+  const grid = document.getElementById('projectsGrid');
+  const empty = document.getElementById('emptyState');
+  document.getElementById('resultsNum').textContent = list.length;
+  const start = (currentPage - 1) * PER_PAGE;
+  const page = list.slice(start, start + PER_PAGE);
+  if (!page.length) { grid.innerHTML = ''; empty.style.display = 'block'; renderPagination(0); return; }
+  empty.style.display = 'none';
+  grid.innerHTML = page.map(p => `
+    <div class="project-card${p.featured ? ' featured' : ''}" onclick="openModal(${p.id})">
+      ${p.featured ? '<div class="featured-badge">⭐ Featured</div>' : ''}
+      <div class="card-top">
+        <div class="card-left">
+          <div class="card-category">${p.category}</div>
+          <div class="card-title">${p.title}</div>
+          <div class="card-company"><span class="verified-dot"></span>${p.company} · ${p.location}</div>
+        </div>
+        <div class="card-right">
+          <button class="bookmark-btn${savedProjects.has(p.id) ? ' saved' : ''}" onclick="toggleSave(event,${p.id})" title="Save project">${savedProjects.has(p.id) ? '🔖' : '🔗'}</button>
+          <div class="card-budget">${p.budgetLabel} <span>fixed</span></div>
+        </div>
+      </div>
+      <div class="card-desc">${p.desc}</div>
+      <div class="card-tags">${p.skills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>
+      <div class="card-bottom">
+        <div class="card-meta">
+          <div class="meta-item">⏰ ${p.deadline}</div>
+          <div class="meta-dot"></div>
+          <div class="meta-item">👥 ${p.applicants} applied</div>
+          <div class="meta-dot"></div>
+          <div class="meta-item">🕐 ${p.postedAgo}</div>
+          ${p.remote ? '<div class="meta-dot"></div><div class="meta-item">🌐 Remote</div>' : ''}
+        </div>
+        <span class="urgency-badge ${p.urgency === 'hot' ? 'urgency-hot' : p.urgency === 'new' ? 'urgency-new' : 'urgency-open'}">
+          ${p.urgency === 'hot' ? '🔥 Urgent' : p.urgency === 'new' ? '🟢 New' : '⬜ Open'}
+        </span>
+      </div>
+    </div>
+  `).join('');
+  renderPagination(list.length);
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / PER_PAGE);
+  const pag = document.getElementById('pagination');
+  if (pages <= 1) { pag.innerHTML = ''; return; }
+  let html = `<button class="page-btn${currentPage===1?' disabled':''}" onclick="goPage(${currentPage-1})">←</button>`;
+  for (let i = 1; i <= pages; i++) {
+    html += `<button class="page-btn${i===currentPage?' active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn${currentPage===pages?' disabled':''}" onclick="goPage(${currentPage+1})">→</button>`;
+  pag.innerHTML = html;
+}
+
+function goPage(n) {
+  const pages = Math.ceil(filtered.length / PER_PAGE);
+  if (n < 1 || n > pages) return;
+  currentPage = n;
+  renderCards(filtered);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function filterProjects() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  const cat = document.getElementById('catFilter').value;
+  const bFilter = document.getElementById('budgetFilter').value;
+  const minB = parseInt(document.getElementById('minBudget').value) || 0;
+  const maxB = parseInt(document.getElementById('maxBudget').value) || Infinity;
+
+  filtered = allProjects.filter(p => {
+    const matchQ = !q || p.title.toLowerCase().includes(q) || p.desc.toLowerCase().includes(q) || p.skills.some(s => s.toLowerCase().includes(q)) || p.company.toLowerCase().includes(q);
+    const matchCat = !cat || p.category === cat;
+    let matchBudget = true;
+    if (bFilter === 'low') matchBudget = p.budget < 2000;
+    else if (bFilter === 'mid') matchBudget = p.budget >= 2000 && p.budget <= 8000;
+    else if (bFilter === 'high') matchBudget = p.budget > 8000 && p.budget <= 20000;
+    else if (bFilter === 'premium') matchBudget = p.budget > 20000;
+    const matchRange = p.budget >= minB && p.budget <= maxB;
+    let matchQuick = true;
+    if (activeQuickFilter === 'new') matchQuick = p.urgency === 'new';
+    else if (activeQuickFilter === 'hot') matchQuick = p.urgency === 'hot';
+    else if (activeQuickFilter !== 'all') matchQuick = p.category === activeQuickFilter;
+    return matchQ && matchCat && matchBudget && matchRange && matchQuick;
+  });
+  currentPage = 1;
+  renderCards(filtered);
+}
+
+function quickFilter(btn, val) {
+  document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  activeQuickFilter = val;
+  filterProjects();
+}
+
+function sortProjects(val) {
+  if (val === 'newest') filtered.sort((a,b) => a.id - b.id);
+  else if (val === 'budget-high') filtered.sort((a,b) => b.budget - a.budget);
+  else if (val === 'budget-low') filtered.sort((a,b) => a.budget - b.budget);
+  currentPage = 1;
+  renderCards(filtered);
+}
+
+function toggleSidebar(el, val) {
+  el.classList.toggle('selected');
+  filterProjects();
+}
+
+function clearAllFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value = '';
+  document.getElementById('budgetFilter').value = '';
+  document.getElementById('minBudget').value = '';
+  document.getElementById('maxBudget').value = '';
+  document.querySelectorAll('.sidebar-option').forEach(o => { o.classList.remove('selected'); const cb = o.querySelector('input'); if(cb) cb.checked = false; });
+  document.querySelectorAll('.filter-tag').forEach(b => b.classList.remove('active'));
+  document.querySelector('.filter-tag').classList.add('active');
+  activeQuickFilter = 'all';
+  filtered = [...allProjects];
+  currentPage = 1;
+  renderCards(filtered);
+}
+
+function toggleSave(e, id) {
+  e.stopPropagation();
+  if (savedProjects.has(id)) savedProjects.delete(id);
+  else savedProjects.add(id);
+  renderCards(filtered);
+}
+
+function openModal(id) {
+  const p = allProjects.find(x => x.id === id);
+  if (!p) return;
+  document.getElementById('modalContent').innerHTML = `
+    <div class="modal-cat">${p.category}</div>
+    <div class="modal-title">${p.title}</div>
+    <div class="modal-company"><span class="verified-dot"></span>${p.company} &nbsp;·&nbsp; ${p.location} &nbsp;·&nbsp; Posted ${p.postedAgo}</div>
+    <div class="modal-grid">
+      <div class="modal-info-item"><div class="modal-info-label">Budget</div><div class="modal-info-val" style="color:var(--accent);font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:800;">${p.budgetLabel}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Deadline</div><div class="modal-info-val">${p.deadline}</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Applicants</div><div class="modal-info-val">${p.applicants} applied</div></div>
+      <div class="modal-info-item"><div class="modal-info-label">Work Type</div><div class="modal-info-val">${p.remote ? '🌐 Remote' : '📍 On-site'}</div></div>
+    </div>
+    <div class="modal-section-title">Project Description</div>
+    <div class="modal-desc">${p.desc}</div>
+    <div class="modal-section-title">Skills Required</div>
+    <div class="modal-tags">${p.skills.map(s=>`<span class="skill-pill">${s}</span>`).join('')}</div>
+    <div class="modal-actions">
+      <button class="btn-modal-apply" onclick="applyNow(${p.id})">Apply Now →</button>
+      <button class="btn-modal-save" onclick="toggleSave(event,${p.id})">${savedProjects.has(p.id)?'Saved ✓':'Save Project'}</button>
+    </div>
+  `;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal(e) { if (e.target === document.getElementById('modalOverlay')) closeModalDirect(); }
+function closeModalDirect() { document.getElementById('modalOverlay').classList.remove('open'); document.body.style.overflow = ''; }
+
+function applyNow(id) {
+  closeModalDirect();
+  window.location.href = 'apply-project.html?id=' + id;
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModalDirect(); });
+
+// Init
+renderCards(allProjects);
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.getElementById('navbar');
+    if(nav) nav.classList.toggle('scrolled', scrollY > 40);
+  });
+
+</script>
+</body>
+</html>

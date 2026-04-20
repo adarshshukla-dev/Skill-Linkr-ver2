@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Dashboard — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --accent2: #1a1a6e; --accent2-light: #eeeeff;
+    --border: #e2ddd6;
+    --green: #1d6f42; --green-light: #e8f5ee;
+    --amber: #b45309; --amber-light: #fffbeb;
+    --red: #dc2626; --red-light: #fef2f2;
+    --sidebar-w: 240px;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  .sidebar {
+    width: var(--sidebar-w); background: var(--ink); color: #fff;
+    display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+    transition: transform 0.3s;
+  }
+  .sidebar-logo { padding: 24px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.07); }
+  .sidebar-logo a { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem; color: #fff; text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .sidebar-user { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.07); display: flex; align-items: center; gap: 12px; }
+  .user-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; color: #fff; flex-shrink: 0; }
+  .user-name { font-size: 0.88rem; font-weight: 500; color: #fff; }
+  .user-badge { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; display: flex; align-items: center; gap: 4px; }
+  .pro-tag { background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: 600; padding: 1px 6px; border-radius: 100px; letter-spacing: 0.05em; }
+
+  .sidebar-nav { flex: 1; padding: 16px 12px; overflow-y: auto; }
+  .nav-section-label { font-size: 0.68rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.3); padding: 0 8px; margin: 16px 0 6px; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; cursor: pointer; transition: background 0.15s; text-decoration: none; color: rgba(255,255,255,0.6); font-size: 0.88rem; font-weight: 400; margin-bottom: 2px; }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+  .nav-item.active { background: rgba(255,92,26,0.15); color: var(--accent); }
+  .nav-item .nav-icon { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+  .nav-badge { margin-left: auto; background: var(--accent); color: #fff; font-size: 0.68rem; font-weight: 600; padding: 1px 7px; border-radius: 100px; }
+
+  .sidebar-bottom { padding: 16px 12px; border-top: 1px solid rgba(255,255,255,0.07); }
+  .btn-logout { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 0.85rem; cursor: pointer; transition: all 0.15s; text-decoration: none; background: none; border: none; font-family: 'DM Sans', sans-serif; width: 100%; }
+  .btn-logout:hover { color: var(--red); background: rgba(220,38,38,0.08); }
+
+  /* ── MAIN ── */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* TOP BAR */
+  .topbar { background: var(--surface); border-bottom: 1px solid var(--border); padding: 14px 32px; display: flex; align-items: center; justify-content: space-between; gap: 16px; position: sticky; top: 0; z-index: 50; }
+  .topbar-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); }
+  .topbar-right { display: flex; align-items: center; gap: 12px; }
+  .topbar-search { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1.5px solid var(--border); border-radius: 8px; padding: 7px 12px; font-size: 0.85rem; color: var(--muted); cursor: pointer; transition: border-color 0.2s; }
+  .topbar-search:hover { border-color: var(--accent); }
+  .notif-btn { position: relative; width: 36px; height: 36px; border-radius: 8px; background: var(--bg); border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1rem; transition: border-color 0.2s; }
+  .notif-btn:hover { border-color: var(--accent); }
+  .notif-dot { position: absolute; top: 5px; right: 5px; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); }
+  .topbar-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.82rem; color: #fff; cursor: pointer; }
+
+  /* CONTENT */
+  .content { padding: 28px 32px; flex: 1; }
+
+  /* GREETING */
+  .greeting-row { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 28px; gap: 16px; flex-wrap: wrap; }
+  .greeting-text h2 { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--ink); margin-bottom: 4px; }
+  .greeting-text p { font-size: 0.88rem; color: var(--muted); font-weight: 300; }
+  .btn-post-project { background: var(--accent); color: #fff; border: none; border-radius: 100px; padding: 11px 24px; font-size: 0.88rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; display: flex; align-items: center; gap: 6px; transition: transform 0.15s, box-shadow 0.15s; white-space: nowrap; }
+  .btn-post-project:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(255,92,26,0.28); }
+
+  /* PROFILE COMPLETION */
+  .profile-banner { background: var(--accent2); color: #fff; border-radius: 16px; padding: 20px 24px; margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  .pb-left { display: flex; align-items: center; gap: 16px; }
+  .pb-icon { font-size: 1.8rem; }
+  .pb-text h4 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 4px; }
+  .pb-text p { font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 300; }
+  .pb-bar-wrap { flex: 1; min-width: 120px; }
+  .pb-bar-track { background: rgba(255,255,255,0.15); border-radius: 4px; height: 6px; margin-bottom: 4px; }
+  .pb-bar-fill { background: #fff; border-radius: 4px; height: 6px; width: 65%; transition: width 1s ease; }
+  .pb-pct { font-size: 0.78rem; color: rgba(255,255,255,0.6); }
+  .btn-complete { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.25); border-radius: 100px; padding: 8px 18px; font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.2s; }
+  .btn-complete:hover { background: rgba(255,255,255,0.25); }
+
+  /* STATS GRID */
+  .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px 20px 16px; transition: transform 0.18s; }
+  .stat-card:hover { transform: translateY(-2px); }
+  .stat-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .stat-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; }
+  .stat-icon.green { background: var(--green-light); }
+  .stat-icon.orange { background: var(--accent-light); }
+  .stat-icon.blue { background: var(--accent2-light); }
+  .stat-icon.amber { background: var(--amber-light); }
+  .stat-trend { font-size: 0.75rem; font-weight: 500; padding: 2px 8px; border-radius: 100px; }
+  .trend-up { background: var(--green-light); color: var(--green); }
+  .trend-new { background: var(--accent-light); color: var(--accent); }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; color: var(--ink); line-height: 1; margin-bottom: 4px; }
+  .stat-label { font-size: 0.8rem; color: var(--muted); font-weight: 400; }
+
+  /* TWO COL LAYOUT */
+  .two-col { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-bottom: 24px; }
+
+  /* SECTION CARD */
+  .section-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1px solid var(--border); }
+  .section-head h3 { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; color: var(--ink); }
+  .section-head a { font-size: 0.82rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+  .section-head a:hover { text-decoration: underline; }
+
+  /* APPLICATIONS TABLE */
+  .app-list { display: flex; flex-direction: column; }
+  .app-item { display: flex; align-items: center; gap: 14px; padding: 14px 22px; border-bottom: 1px solid var(--border); transition: background 0.15s; cursor: pointer; }
+  .app-item:last-child { border-bottom: none; }
+  .app-item:hover { background: var(--bg); }
+  .app-logo { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; border: 1px solid var(--border); background: var(--bg); }
+  .app-info { flex: 1; min-width: 0; }
+  .app-title { font-size: 0.88rem; font-weight: 500; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 3px; }
+  .app-company { font-size: 0.78rem; color: var(--muted); }
+  .app-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
+  .app-budget { font-size: 0.85rem; font-weight: 600; color: var(--ink); font-family: 'Syne', sans-serif; }
+  .status-pill { font-size: 0.7rem; font-weight: 500; padding: 3px 10px; border-radius: 100px; white-space: nowrap; }
+  .status-review { background: var(--amber-light); color: var(--amber); }
+  .status-shortlisted { background: var(--accent2-light); color: var(--accent2); }
+  .status-accepted { background: var(--green-light); color: var(--green); }
+  .status-rejected { background: var(--red-light); color: var(--red); }
+  .status-submitted { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+
+  /* EARNINGS CHART */
+  .chart-wrap { padding: 20px 22px; }
+  .chart-meta { display: flex; gap: 16px; margin-bottom: 16px; flex-wrap: wrap; }
+  .chart-meta-item { }
+  .chart-meta-num { font-family: 'Syne', sans-serif; font-size: 1.3rem; font-weight: 800; color: var(--ink); }
+  .chart-meta-label { font-size: 0.75rem; color: var(--muted); }
+  .bar-chart { display: flex; align-items: flex-end; gap: 8px; height: 100px; }
+  .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; background: var(--border); transition: background 0.2s; cursor: pointer; min-height: 4px; }
+  .bar:hover { background: var(--accent) !important; }
+  .bar.current { background: var(--accent) !important; }
+  .bar-month { font-size: 0.68rem; color: var(--muted); }
+
+  /* RECOMMENDED PROJECTS */
+  .rec-list { display: flex; flex-direction: column; }
+  .rec-item { padding: 14px 22px; border-bottom: 1px solid var(--border); cursor: pointer; transition: background 0.15s; }
+  .rec-item:last-child { border-bottom: none; }
+  .rec-item:hover { background: var(--bg); }
+  .rec-cat { font-size: 0.72rem; font-weight: 500; text-transform: uppercase; letter-spacing: 0.08em; color: var(--accent); margin-bottom: 4px; }
+  .rec-title { font-size: 0.88rem; font-weight: 500; color: var(--ink); margin-bottom: 4px; line-height: 1.3; }
+  .rec-meta { display: flex; align-items: center; gap: 10px; font-size: 0.78rem; color: var(--muted); }
+  .rec-budget { font-weight: 600; color: var(--green); }
+
+  /* ACTIVITY FEED */
+  .activity-list { padding: 4px 0; }
+  .activity-item { display: flex; gap: 12px; padding: 12px 22px; }
+  .activity-dot-wrap { display: flex; flex-direction: column; align-items: center; gap: 0; }
+  .activity-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; margin-top: 4px; }
+  .activity-line { width: 1px; flex: 1; background: var(--border); margin-top: 4px; }
+  .activity-item:last-child .activity-line { display: none; }
+  .activity-body { flex: 1; padding-bottom: 8px; }
+  .activity-text { font-size: 0.85rem; color: var(--ink2); line-height: 1.5; }
+  .activity-text b { font-weight: 500; }
+  .activity-time { font-size: 0.75rem; color: var(--muted); margin-top: 3px; }
+
+  /* PROFILE CARD */
+  .profile-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
+  .profile-cover { height: 64px; background: linear-gradient(135deg, var(--accent2) 0%, var(--accent) 100%); }
+  .profile-body { padding: 0 20px 20px; }
+  .profile-avatar-wrap { display: flex; justify-content: space-between; align-items: flex-end; margin-top: -20px; margin-bottom: 12px; }
+  .profile-avatar { width: 48px; height: 48px; border-radius: 50%; background: var(--accent); border: 3px solid var(--surface); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; color: #fff; }
+  .edit-profile-btn { font-size: 0.78rem; color: var(--accent); text-decoration: none; font-weight: 500; }
+  .profile-name { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+  .profile-role { font-size: 0.8rem; color: var(--muted); margin-bottom: 12px; }
+  .profile-skills { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+  .profile-skill-tag { font-size: 0.73rem; background: var(--bg); border: 1px solid var(--border); border-radius: 100px; padding: 3px 10px; color: var(--ink2); }
+  .profile-stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border-top: 1px solid var(--border); }
+  .pstat { text-align: center; padding: 12px 8px; border-right: 1px solid var(--border); }
+  .pstat:last-child { border-right: none; }
+  .pstat-num { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--ink); }
+  .pstat-label { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  /* QUICK ACTIONS */
+  .quick-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 16px 20px; }
+  .qa-btn { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; padding: 11px 14px; font-size: 0.83rem; font-weight: 500; color: var(--ink2); cursor: pointer; text-decoration: none; transition: border-color 0.2s, background 0.2s; font-family: 'DM Sans', sans-serif; }
+  .qa-btn:hover { border-color: var(--accent); background: var(--accent-light); color: var(--accent); }
+  .qa-icon { font-size: 1rem; }
+
+  /* MOBILE NAV TOGGLE */
+  .mobile-toggle { display: none; position: fixed; top: 14px; left: 14px; z-index: 200; background: var(--ink); border: none; border-radius: 8px; padding: 8px; cursor: pointer; color: #fff; font-size: 1.1rem; }
+  .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 99; }
+  .sidebar-overlay.open { display: block; }
+
+  @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 900px) {
+    .two-col { grid-template-columns: 1fr; }
+    .sidebar { transform: translateX(-100%); }
+    .sidebar.open { transform: translateX(0); }
+    .main { margin-left: 0; }
+    .mobile-toggle { display: flex; }
+    .topbar { padding: 14px 16px 14px 56px; }
+    .content { padding: 20px 16px; }
+  }
+  @media (max-width: 600px) { .stats-grid { grid-template-columns: 1fr 1fr; } .greeting-row { flex-direction: column; } }
+</style>
+</head>
+<body>
+
+<button class="mobile-toggle" onclick="toggleSidebar()">☰</button>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <a href="index.html"><span class="logo-dot"></span>Skill Linkr</a>
+  </div>
+
+  <div class="sidebar-user">
+    <div class="user-avatar">RK</div>
+    <div>
+      <div class="user-name">Rahul Kumar</div>
+      <div class="user-badge"><span class="pro-tag">PRO</span> B.Tech · AKTU Lucknow</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Main</div>
+    <a class="nav-item active" href="#" onclick="switchTab('dashboard',this)"><span class="nav-icon">🏠</span> Dashboard</a>
+    <a class="nav-item" href="projects.html"><span class="nav-icon">🔍</span> Browse Projects</a>
+    <a class="nav-item" href="#" onclick="switchTab('applications',this)"><span class="nav-icon">📋</span> My Applications <span class="nav-badge">3</span></a>
+    <a class="nav-item" href="#" onclick="switchTab('active',this)"><span class="nav-icon">⚡</span> Active Projects</a>
+    <a class="nav-item" href="#" onclick="switchTab('saved',this)"><span class="nav-icon">🔖</span> Saved</a>
+    <a class="nav-item" href="collaboration.html"><span class="nav-icon">🤝</span> Find Collaborator</a>
+    <a class="nav-item" href="verification.html"><span class="nav-icon">✅</span> Get Verified</a>
+
+    <div class="nav-section-label">Earnings</div>
+    <a class="nav-item" href="#" onclick="switchTab('earnings',this)"><span class="nav-icon">💰</span> Earnings</a>
+    <a class="nav-item" href="#" onclick="switchTab('payments',this)"><span class="nav-icon">🏦</span> Payments</a>
+
+    <div class="nav-section-label">Profile</div>
+    <a class="nav-item" href="#" onclick="switchTab('profile',this)"><span class="nav-icon">👤</span> My Profile</a>
+    <a class="nav-item" href="#" onclick="switchTab('portfolio',this)"><span class="nav-icon">🎨</span> Portfolio</a>
+    <a class="nav-item" href="#" onclick="switchTab('settings',this)"><span class="nav-icon">⚙️</span> Settings</a>
+  </nav>
+
+  <div class="sidebar-bottom">
+    <a href="login.html" class="btn-logout"><span>🚪</span> Log Out</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-title" id="pageTitle">Dashboard</div>
+    <div class="topbar-right">
+      <div class="topbar-search">🔍 <span style="font-size:0.82rem;">Search projects...</span></div>
+      <div class="notif-btn" onclick="toggleNotifs()" title="Notifications">🔔<div class="notif-dot"></div></div>
+      <div class="topbar-avatar">RK</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content" id="mainContent">
+
+    <!-- ── DASHBOARD TAB ── -->
+    <div id="tab-dashboard">
+      <div class="greeting-row">
+        <div class="greeting-text">
+          <h2>Good morning, Rahul 👋</h2>
+          <p>You have 3 pending applications and 2 new project matches today.</p>
+        </div>
+        <a href="projects.html" class="btn-post-project">Browse Projects →</a>
+      </div>
+
+      <!-- Profile Completion -->
+      <div class="profile-banner">
+        <div class="pb-left">
+          <div class="pb-icon">📝</div>
+          <div class="pb-text">
+            <h4>Complete your profile — 65% done</h4>
+            <p>Add a portfolio link and bio to get 3× more client views</p>
+          </div>
+        </div>
+        <div class="pb-bar-wrap">
+          <div class="pb-bar-track"><div class="pb-bar-fill" id="profileBar"></div></div>
+          <div class="pb-pct">65% complete</div>
+        </div>
+        <button class="btn-complete" onclick="switchTab('profile',null)">Complete Profile →</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon green">💰</div>
+            <span class="stat-trend trend-up">↑ ₹2,000</span>
+          </div>
+          <div class="stat-num">₹8,500</div>
+          <div class="stat-label">Total Earned</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon orange">📋</div>
+            <span class="stat-trend trend-new">3 active</span>
+          </div>
+          <div class="stat-num">7</div>
+          <div class="stat-label">Applications Sent</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon blue">✅</div>
+            <span class="stat-trend trend-up">↑ 1 this month</span>
+          </div>
+          <div class="stat-num">3</div>
+          <div class="stat-label">Projects Completed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-top">
+            <div class="stat-icon amber">⭐</div>
+            <span class="stat-trend trend-up">↑ 0.2</span>
+          </div>
+          <div class="stat-num">4.8</div>
+          <div class="stat-label">Avg. Rating</div>
+        </div>
+      </div>
+
+      <!-- Applications + Chart -->
+      <div class="two-col">
+        <div class="section-card">
+          <div class="section-head">
+            <h3>My Applications</h3>
+            <a href="#" onclick="switchTab('applications',null)">View all →</a>
+          </div>
+          <div class="app-list">
+            <div class="app-item">
+              <div class="app-logo">🎨</div>
+              <div class="app-info">
+                <div class="app-title">Brand Identity Design for EdTech Startup</div>
+                <div class="app-company">LearnFast India · Noida</div>
+              </div>
+              <div class="app-right">
+                <div class="app-budget">₹8,000</div>
+                <span class="status-pill status-shortlisted">Shortlisted</span>
+              </div>
+            </div>
+            <div class="app-item">
+              <div class="app-logo">📱</div>
+              <div class="app-info">
+                <div class="app-title">Instagram & LinkedIn Content for 1 Month</div>
+                <div class="app-company">GrowthHub Lucknow</div>
+              </div>
+              <div class="app-right">
+                <div class="app-budget">₹5,000</div>
+                <span class="status-pill status-review">Under Review</span>
+              </div>
+            </div>
+            <div class="app-item">
+              <div class="app-logo">💻</div>
+              <div class="app-info">
+                <div class="app-title">React.js Frontend for Food Delivery App</div>
+                <div class="app-company">QuickBite Agra</div>
+              </div>
+              <div class="app-right">
+                <div class="app-budget">₹15,000</div>
+                <span class="status-pill status-submitted">Submitted</span>
+              </div>
+            </div>
+            <div class="app-item">
+              <div class="app-logo">📊</div>
+              <div class="app-info">
+                <div class="app-title">Market Research — EV Segment India</div>
+                <div class="app-company">GreenMobility Labs</div>
+              </div>
+              <div class="app-right">
+                <div class="app-budget">₹4,000</div>
+                <span class="status-pill status-accepted">Accepted ✓</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar right col -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+          <!-- Earnings Mini Chart -->
+          <div class="section-card">
+            <div class="section-head"><h3>Earnings This Month</h3></div>
+            <div class="chart-wrap">
+              <div class="chart-meta">
+                <div class="chart-meta-item"><div class="chart-meta-num">₹3,500</div><div class="chart-meta-label">April so far</div></div>
+                <div class="chart-meta-item"><div class="chart-meta-num" style="color:var(--green)">↑ 40%</div><div class="chart-meta-label">vs last month</div></div>
+              </div>
+              <div class="bar-chart" id="earningsChart"></div>
+            </div>
+          </div>
+
+          <!-- Profile Card -->
+          <div class="profile-card">
+            <div class="profile-cover"></div>
+            <div class="profile-body">
+              <div class="profile-avatar-wrap">
+                <div class="profile-avatar">RK</div>
+                <a href="#" class="edit-profile-btn" onclick="switchTab('profile',null)">Edit →</a>
+              </div>
+              <div class="profile-name">Rahul Kumar</div>
+              <div class="profile-role">Web Developer · B.Tech 3rd Year · AKTU</div>
+              <div class="profile-skills">
+                <span class="profile-skill-tag">React.js</span>
+                <span class="profile-skill-tag">Python</span>
+                <span class="profile-skill-tag">UI Design</span>
+                <span class="profile-skill-tag">+3</span>
+              </div>
+              <div class="profile-stats">
+                <div class="pstat"><div class="pstat-num">3</div><div class="pstat-label">Done</div></div>
+                <div class="pstat"><div class="pstat-num">4.8★</div><div class="pstat-label">Rating</div></div>
+                <div class="pstat"><div class="pstat-num">65%</div><div class="pstat-label">Profile</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recommended + Activity -->
+      <div class="two-col">
+        <div class="section-card">
+          <div class="section-head"><h3>Recommended for You</h3><a href="projects.html">See all →</a></div>
+          <div class="rec-list">
+            <div class="rec-item" onclick="window.location.href='projects.html'">
+              <div class="rec-cat">Development</div>
+              <div class="rec-title">Python Script for Automated WhatsApp Alerts</div>
+              <div class="rec-meta"><span class="rec-budget">₹2,500</span> · Remote · 5 days</div>
+            </div>
+            <div class="rec-item" onclick="window.location.href='projects.html'">
+              <div class="rec-cat">Development</div>
+              <div class="rec-title">WordPress Website for NGO</div>
+              <div class="rec-meta"><span class="rec-budget">₹6,000</span> · Remote · 12 days</div>
+            </div>
+            <div class="rec-item" onclick="window.location.href='projects.html'">
+              <div class="rec-cat">Design</div>
+              <div class="rec-title">UI/UX Design for Gym Management App</div>
+              <div class="rec-meta"><span class="rec-budget">₹12,000</span> · Remote · 14 days</div>
+            </div>
+            <div class="rec-item" onclick="window.location.href='projects.html'">
+              <div class="rec-cat">Marketing</div>
+              <div class="rec-title">Google Ads Campaign Setup & Management</div>
+              <div class="rec-meta"><span class="rec-budget">₹7,000</span> · Remote · Ongoing</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section-card">
+          <div class="section-head"><h3>Recent Activity</h3></div>
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--green)"></div><div class="activity-line"></div></div>
+              <div class="activity-body"><div class="activity-text"><b>GreenMobility Labs</b> accepted your proposal for Market Research project</div><div class="activity-time">2 hours ago</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--accent2)"></div><div class="activity-line"></div></div>
+              <div class="activity-body"><div class="activity-text">You were <b>shortlisted</b> for Brand Identity Design at LearnFast India</div><div class="activity-time">Yesterday, 4:30 PM</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--accent)"></div><div class="activity-line"></div></div>
+              <div class="activity-body"><div class="activity-text">You applied to <b>React.js Frontend for Food Delivery App</b></div><div class="activity-time">Yesterday, 11:00 AM</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--amber)"></div><div class="activity-line"></div></div>
+              <div class="activity-body"><div class="activity-text"><b>₹2,500</b> payment received for Logo Design project</div><div class="activity-time">3 days ago</div></div>
+            </div>
+            <div class="activity-item">
+              <div class="activity-dot-wrap"><div class="activity-dot" style="background:var(--border)"></div></div>
+              <div class="activity-body"><div class="activity-text">Profile viewed by <b>3 new clients</b> this week</div><div class="activity-time">4 days ago</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="section-card" style="margin-bottom:8px;">
+        <div class="section-head"><h3>Quick Actions</h3></div>
+        <div class="quick-actions">
+          <a href="projects.html" class="qa-btn"><span class="qa-icon">🔍</span> Browse Projects</a>
+          <a href="#" class="qa-btn" onclick="switchTab('profile',null)"><span class="qa-icon">📝</span> Edit Profile</a>
+          <a href="#" class="qa-btn" onclick="switchTab('earnings',null)"><span class="qa-icon">💰</span> View Earnings</a>
+          <a href="#" class="qa-btn" onclick="switchTab('portfolio',null)"><span class="qa-icon">🎨</span> Add Portfolio</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── PLACEHOLDER TABS ── -->
+    <div id="tab-applications" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>My Applications</h2><p>Track all your project applications in one place.</p></div></div>
+      <div class="section-card">
+        <div class="app-list">
+          <div class="app-item"><div class="app-logo">🎨</div><div class="app-info"><div class="app-title">Brand Identity Design for EdTech Startup</div><div class="app-company">LearnFast India · Applied 2 days ago</div></div><div class="app-right"><div class="app-budget">₹8,000</div><span class="status-pill status-shortlisted">Shortlisted</span></div></div>
+          <div class="app-item"><div class="app-logo">📱</div><div class="app-info"><div class="app-title">Instagram & LinkedIn Content for 1 Month</div><div class="app-company">GrowthHub Lucknow · Applied 3 days ago</div></div><div class="app-right"><div class="app-budget">₹5,000</div><span class="status-pill status-review">Under Review</span></div></div>
+          <div class="app-item"><div class="app-logo">💻</div><div class="app-info"><div class="app-title">React.js Frontend for Food Delivery App</div><div class="app-company">QuickBite Agra · Applied 1 day ago</div></div><div class="app-right"><div class="app-budget">₹15,000</div><span class="status-pill status-submitted">Submitted</span></div></div>
+          <div class="app-item"><div class="app-logo">📊</div><div class="app-info"><div class="app-title">Market Research — EV Segment India</div><div class="app-company">GreenMobility Labs · Applied 4 days ago</div></div><div class="app-right"><div class="app-budget">₹4,000</div><span class="status-pill status-accepted">Accepted ✓</span></div></div>
+          <div class="app-item"><div class="app-logo">🖼️</div><div class="app-info"><div class="app-title">Logo & Business Card Design for CA Firm</div><div class="app-company">Agrawal & Associates · Applied 6 days ago</div></div><div class="app-right"><div class="app-budget">₹1,800</div><span class="status-pill status-rejected">Not Selected</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-earnings" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>Earnings</h2><p>Your complete earning history and payout records.</p></div></div>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-top"><div class="stat-icon green">💰</div></div><div class="stat-num">₹8,500</div><div class="stat-label">Total Earned</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-icon orange">📅</div></div><div class="stat-num">₹3,500</div><div class="stat-label">This Month</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-icon blue">⏳</div></div><div class="stat-num">₹4,000</div><div class="stat-label">Pending Payout</div></div>
+        <div class="stat-card"><div class="stat-top"><div class="stat-icon amber">✅</div></div><div class="stat-num">3</div><div class="stat-label">Projects Paid</div></div>
+      </div>
+      <div class="section-card">
+        <div class="section-head"><h3>Transaction History</h3></div>
+        <div class="app-list">
+          <div class="app-item"><div class="app-logo">✅</div><div class="app-info"><div class="app-title">Market Research Report — EV Segment</div><div class="app-company">GreenMobility Labs · In Escrow</div></div><div class="app-right"><div class="app-budget" style="color:var(--amber)">₹4,000 pending</div><span class="status-pill status-review">In Escrow</span></div></div>
+          <div class="app-item"><div class="app-logo">💳</div><div class="app-info"><div class="app-title">Logo Design for DesiKart</div><div class="app-company">DesiKart Store · April 8, 2026</div></div><div class="app-right"><div class="app-budget" style="color:var(--green)">₹2,500 paid</div><span class="status-pill status-accepted">Paid ✓</span></div></div>
+          <div class="app-item"><div class="app-logo">💳</div><div class="app-info"><div class="app-title">Social Media Content — March</div><div class="app-company">LocalBrand UP · March 25, 2026</div></div><div class="app-right"><div class="app-budget" style="color:var(--green)">₹3,000 paid</div><span class="status-pill status-accepted">Paid ✓</span></div></div>
+          <div class="app-item"><div class="app-logo">💳</div><div class="app-info"><div class="app-title">Website Copy — 5 Pages</div><div class="app-company">TechCo Agra · March 10, 2026</div></div><div class="app-right"><div class="app-budget" style="color:var(--green)">₹3,000 paid</div><span class="status-pill status-accepted">Paid ✓</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-active" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>Active Projects</h2><p>Projects you're currently working on.</p></div></div>
+      <div class="section-card">
+        <div class="section-head"><h3>In Progress</h3></div>
+        <div class="app-list">
+          <div class="app-item"><div class="app-logo">📊</div><div class="app-info"><div class="app-title">Market Research Report — EV Segment India</div><div class="app-company">GreenMobility Labs · Due in 5 days</div></div><div class="app-right"><div class="app-budget">₹4,000</div><span class="status-pill status-review">In Progress</span></div></div>
+        </div>
+        <div style="padding:32px;text-align:center;color:var(--muted);font-size:0.88rem;">No other active projects. <a href="projects.html" style="color:var(--accent);text-decoration:none;">Browse more →</a></div>
+      </div>
+    </div>
+
+    <div id="tab-saved" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>Saved Projects</h2><p>Projects you bookmarked for later.</p></div></div>
+      <div style="text-align:center;padding:64px 24px;color:var(--muted);">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🔖</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:8px;">No saved projects yet</div>
+        <div style="font-size:0.88rem;margin-bottom:20px;">Browse projects and save the ones you like for later.</div>
+        <a href="projects.html" class="btn-post-project" style="display:inline-flex;">Browse Projects →</a>
+      </div>
+    </div>
+
+    <div id="tab-profile" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>My Profile</h2><p>This is how clients see you. Keep it updated!</p></div></div>
+      <div class="two-col">
+        <div class="section-card">
+          <div class="section-head"><h3>Profile Details</h3><a href="#">Save Changes</a></div>
+          <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+              <div style="flex:1;min-width:140px;display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">First Name</label><input type="text" value="Rahul" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+              <div style="flex:1;min-width:140px;display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">Last Name</label><input type="text" value="Kumar" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">Email</label><input type="email" value="rahul.kumar@example.com" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+            <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">Bio</label><textarea style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;resize:vertical;min-height:80px;">B.Tech student at AKTU Lucknow, specialising in web development. I love building clean UIs and working on real-world startup projects.</textarea></div>
+            <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">Portfolio URL</label><input type="url" placeholder="https://behance.net/rahul" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+            <button style="background:var(--accent);color:#fff;border:none;border-radius:100px;padding:11px 28px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;width:fit-content;transition:opacity 0.2s;" onmouseover="this.style.opacity=0.85" onmouseout="this.style.opacity=1">Save Profile</button>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:16px;">
+          <div class="profile-card">
+            <div class="profile-cover"></div>
+            <div class="profile-body">
+              <div class="profile-avatar-wrap"><div class="profile-avatar">RK</div></div>
+              <div class="profile-name">Rahul Kumar</div>
+              <div class="profile-role">Web Developer · B.Tech 3rd Year · AKTU</div>
+              <div class="profile-skills"><span class="profile-skill-tag">React.js</span><span class="profile-skill-tag">Python</span><span class="profile-skill-tag">UI Design</span><span class="profile-skill-tag">Node.js</span></div>
+              <div class="profile-stats">
+                <div class="pstat"><div class="pstat-num">3</div><div class="pstat-label">Done</div></div>
+                <div class="pstat"><div class="pstat-num">4.8★</div><div class="pstat-label">Rating</div></div>
+                <div class="pstat"><div class="pstat-num">65%</div><div class="pstat-label">Profile</div></div>
+              </div>
+            </div>
+          </div>
+          <div class="section-card">
+            <div class="section-head"><h3>Profile Checklist</h3></div>
+            <div style="padding:14px 20px;display:flex;flex-direction:column;gap:10px;font-size:0.85rem;">
+              <div style="display:flex;gap:8px;align-items:center;color:var(--green);">✅ Basic info added</div>
+              <div style="display:flex;gap:8px;align-items:center;color:var(--green);">✅ Education filled</div>
+              <div style="display:flex;gap:8px;align-items:center;color:var(--green);">✅ Skills selected</div>
+              <div style="display:flex;gap:8px;align-items:center;color:var(--muted);">⬜ Portfolio link missing</div>
+              <div style="display:flex;gap:8px;align-items:center;color:var(--muted);">⬜ Profile photo not uploaded</div>
+              <div style="display:flex;gap:8px;align-items:center;color:var(--muted);">⬜ Bio too short (min 100 chars)</div>
+              <div style="display:flex;gap:8px;align-items:center;margin-top:4px;"><a href="verification.html" style="font-size:.82rem;color:var(--accent);font-weight:500;">→ Get college verified</a></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-portfolio" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>My Portfolio</h2><p>Showcase your best work to attract clients.</p></div><button class="btn-post-project">+ Add Work Sample</button></div>
+      <div style="text-align:center;padding:64px 24px;border:2px dashed var(--border);border-radius:16px;color:var(--muted);">
+        <div style="font-size:2.5rem;margin-bottom:12px;">🎨</div>
+        <div style="font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--ink);margin-bottom:8px;">No portfolio items yet</div>
+        <div style="font-size:0.88rem;margin-bottom:20px;">Add images, links, or descriptions of your past projects.</div>
+        <button class="btn-post-project" style="margin:0 auto;">+ Upload Work Sample</button>
+      </div>
+    </div>
+
+    <div id="tab-payments" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>Payments</h2><p>Manage your bank account and payout preferences.</p></div></div>
+      <div class="section-card" style="max-width:500px;">
+        <div class="section-head"><h3>Bank Account Details</h3></div>
+        <div style="padding:22px;display:flex;flex-direction:column;gap:14px;">
+          <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">Account Holder Name</label><input type="text" placeholder="As per bank records" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">Account Number</label><input type="text" placeholder="Enter account number" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">IFSC Code</label><input type="text" placeholder="e.g. SBIN0001234" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+          <div style="display:flex;flex-direction:column;gap:5px;"><label style="font-size:0.8rem;font-weight:500;color:var(--ink2);">UPI ID <span style="color:var(--muted);font-size:0.75rem;">(optional)</span></label><input type="text" placeholder="yourname@upi" style="padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;outline:none;"/></div>
+          <button style="background:var(--accent);color:#fff;border:none;border-radius:100px;padding:11px 28px;font-size:0.9rem;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;width:fit-content;">Save Bank Details</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="tab-settings" style="display:none;">
+      <div class="greeting-row"><div class="greeting-text"><h2>Settings</h2><p>Manage your account preferences.</p></div></div>
+      <div class="section-card" style="max-width:500px;">
+        <div class="section-head"><h3>Notifications</h3></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:14px;font-size:0.88rem;color:var(--ink2);">
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">New project matches <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;"></label>
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">Application status updates <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;"></label>
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">Payment received <input type="checkbox" checked style="accent-color:var(--accent);width:16px;height:16px;"></label>
+          <label style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;">Weekly digest email <input type="checkbox" style="accent-color:var(--accent);width:16px;height:16px;"></label>
+        </div>
+        <div class="section-head" style="border-top:1px solid var(--border);"><h3>Account</h3></div>
+        <div style="padding:20px;display:flex;flex-direction:column;gap:10px;">
+          <button style="background:transparent;border:1.5px solid var(--border);border-radius:8px;padding:10px 16px;font-size:0.88rem;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink);text-align:left;">Change Password</button>
+          <button style="background:transparent;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 16px;font-size:0.88rem;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--red);text-align:left;">Delete Account</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // TAB SWITCHER
+  const tabs = ['dashboard','applications','active','saved','earnings','profile','portfolio','payments','settings'];
+  const tabTitles = { dashboard:'Dashboard', applications:'My Applications', active:'Active Projects', saved:'Saved Projects', earnings:'Earnings', profile:'My Profile', portfolio:'Portfolio', payments:'Payments', settings:'Settings' };
+
+  function switchTab(name, navEl) {
+    tabs.forEach(t => { document.getElementById('tab-' + t).style.display = 'none'; });
+    document.getElementById('tab-' + name).style.display = 'block';
+    document.getElementById('pageTitle').textContent = tabTitles[name] || name;
+    document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+    if (navEl) navEl.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (window.innerWidth < 900) closeSidebar();
+  }
+
+  // SIDEBAR MOBILE
+  function toggleSidebar() {
+    const sb = document.getElementById('sidebar');
+    const ov = document.getElementById('sidebarOverlay');
+    sb.classList.toggle('open');
+    ov.classList.toggle('open');
+  }
+  function closeSidebar() {
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('sidebarOverlay').classList.remove('open');
+  }
+
+  // EARNINGS BAR CHART
+  const months = ['Oct','Nov','Dec','Jan','Feb','Mar','Apr'];
+  const earnings = [1200, 0, 2500, 500, 3000, 2500, 3500];
+  const maxE = Math.max(...earnings);
+  const chart = document.getElementById('earningsChart');
+  if (chart) {
+    chart.innerHTML = months.map((m, i) => `
+      <div class="bar-col">
+        <div class="bar${i === 6 ? ' current' : ''}" style="height:${Math.max(4, Math.round((earnings[i]/maxE)*80))}px;" title="₹${earnings[i].toLocaleString('en-IN')}"></div>
+        <div class="bar-month">${m}</div>
+      </div>
+    `).join('');
+  }
+
+  // PROFILE BAR ANIMATION
+  setTimeout(() => {
+    const bar = document.getElementById('profileBar');
+    if (bar) bar.style.width = '65%';
+  }, 400);
+
+  // NOTIFICATIONS (simple toggle)
+  function toggleNotifs() {
+    alert('You have 3 unread notifications:\n\n🟢 GreenMobility Labs accepted your proposal\n🔵 You were shortlisted at LearnFast India\n💰 ₹2,500 payment received');
+  }
+</script>
+</body>
+</html>

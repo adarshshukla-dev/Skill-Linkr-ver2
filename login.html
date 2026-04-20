@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --border: #e2ddd6; --green: #1d6f42; --green-light: #e8f5ee;
+    --error: #dc2626; --error-light: #fef2f2;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+
+  nav {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 18px 5%; border-bottom: 1px solid var(--border);
+    background: rgba(245,242,235,0.95); backdrop-filter: blur(10px);
+  }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--accent); display: inline-block; }
+  .nav-right { font-size: 0.88rem; color: var(--muted); }
+  .nav-right a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+  .page-wrap {
+    display: grid; grid-template-columns: 1fr 1fr;
+    flex: 1; min-height: calc(100vh - 65px);
+  }
+
+  /* LEFT */
+  .left-panel {
+    background: var(--ink); color: #fff;
+    padding: 64px 52px;
+    display: flex; flex-direction: column; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .left-tag { display: inline-block; background: rgba(255,92,26,0.15); color: var(--accent); font-size: 0.75rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; border-radius: 100px; padding: 5px 14px; margin-bottom: 28px; width: fit-content; }
+  .left-title { font-family: 'Syne', sans-serif; font-size: 2.2rem; font-weight: 800; line-height: 1.2; margin-bottom: 16px; }
+  .left-sub { font-size: 0.92rem; color: rgba(255,255,255,0.5); line-height: 1.7; font-weight: 300; max-width: 320px; margin-bottom: 48px; }
+
+  .testimonial-card {
+    background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px; padding: 24px 28px; margin-bottom: 24px;
+  }
+  .testi-quote { font-size: 0.92rem; color: rgba(255,255,255,0.8); line-height: 1.7; font-style: italic; margin-bottom: 16px; font-weight: 300; }
+  .testi-person { display: flex; align-items: center; gap: 12px; }
+  .testi-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.82rem; color: #fff; flex-shrink: 0; }
+  .testi-info-name { font-size: 0.85rem; font-weight: 500; color: #fff; }
+  .testi-info-role { font-size: 0.77rem; color: rgba(255,255,255,0.4); }
+
+  .stat-strip { display: flex; gap: 32px; }
+  .s-num { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--accent); }
+  .s-label { font-size: 0.78rem; color: rgba(255,255,255,0.4); margin-top: 2px; }
+
+  .left-bg { position: absolute; bottom: -30px; right: -20px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 10rem; color: transparent; -webkit-text-stroke: 1px rgba(255,255,255,0.04); user-select: none; pointer-events: none; line-height: 1; }
+
+  /* RIGHT */
+  .right-panel {
+    display: flex; align-items: center; justify-content: center;
+    padding: 48px 56px;
+    background: var(--surface);
+  }
+  .form-box { width: 100%; max-width: 400px; }
+
+  /* TABS */
+  .role-tabs { display: flex; background: var(--bg); border-radius: 12px; padding: 4px; margin-bottom: 32px; gap: 4px; }
+  .role-tab {
+    flex: 1; padding: 10px; border: none; border-radius: 9px;
+    background: transparent; font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem; font-weight: 500; color: var(--muted);
+    cursor: pointer; transition: all 0.2s;
+  }
+  .role-tab.active { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+
+  .form-title { font-family: 'Syne', sans-serif; font-size: 1.6rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .form-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 28px; font-weight: 300; }
+
+  .form-group { margin-bottom: 16px; display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.83rem; font-weight: 500; color: var(--ink2); }
+  .input-wrap { position: relative; }
+  input[type="email"], input[type="password"], input[type="text"] {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; background: var(--bg); color: var(--ink);
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  }
+  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,92,26,0.08); background: var(--surface); }
+  input.error-field { border-color: var(--error); background: var(--error-light); }
+  .pw-toggle { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--muted); padding: 4px; }
+
+  .forgot-row { display: flex; justify-content: flex-end; margin-top: -8px; margin-bottom: 8px; }
+  .forgot-link { font-size: 0.82rem; color: var(--accent); text-decoration: none; }
+  .forgot-link:hover { text-decoration: underline; }
+
+  .error-banner { background: var(--error-light); border: 1px solid #fca5a5; border-radius: 10px; padding: 12px 16px; font-size: 0.85rem; color: var(--error); margin-bottom: 16px; display: none; align-items: center; gap: 8px; }
+  .error-banner.show { display: flex; }
+
+  .btn-login {
+    width: 100%; background: var(--accent); color: #fff; border: none;
+    border-radius: 100px; padding: 13px; font-size: 0.95rem; font-weight: 500;
+    cursor: pointer; font-family: 'DM Sans', sans-serif;
+    transition: transform 0.15s, box-shadow 0.15s; margin-top: 4px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  .btn-login:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,92,26,0.3); }
+  .btn-login:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .or-divider { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .or-divider::before, .or-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .or-divider span { font-size: 0.78rem; color: var(--muted); }
+
+  .social-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 11px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--surface); font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; color: var(--ink); cursor: pointer; transition: border-color 0.2s, background 0.2s; margin-bottom: 10px; text-decoration: none; }
+  .social-btn:hover { border-color: var(--ink); background: var(--bg); }
+  .g-icon { width: 18px; height: 18px; }
+
+  .signup-prompt { text-align: center; margin-top: 24px; font-size: 0.85rem; color: var(--muted); }
+  .signup-prompt a { color: var(--accent); text-decoration: none; font-weight: 500; }
+
+  /* SUCCESS */
+  .login-success { text-align: center; display: none; }
+  .success-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; margin: 0 auto 20px; }
+  .success-title { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+  .success-sub { font-size: 0.88rem; color: var(--muted); margin-bottom: 24px; }
+  .btn-go { display: inline-block; background: var(--ink); color: #fff; border-radius: 100px; padding: 12px 28px; font-size: 0.9rem; font-weight: 500; text-decoration: none; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .btn-go:hover { background: var(--accent); }
+
+  /* FORGOT PASSWORD MODAL */
+  .modal-overlay { position: sticky; inset: 0; background: rgba(0,0,0,0.4); z-index: 200; display: none; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .modal-overlay.open { display: flex; }
+  .modal-box { background: var(--surface); border-radius: 20px; padding: 36px; max-width: 380px; width: 90%; position: relative; animation: popIn 0.25s ease; }
+  @keyframes popIn { from { transform: scale(0.93); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-close { position: absolute; top: 16px; right: 20px; font-size: 1.3rem; cursor: pointer; color: var(--muted); background: none; border: none; }
+  .modal-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+  .modal-sub { font-size: 0.86rem; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+  .modal-success { text-align: center; display: none; padding: 8px 0; }
+  .modal-success p { font-size: 0.9rem; color: var(--green); font-weight: 500; margin-top: 12px; }
+
+  @media (max-width: 800px) {
+    .page-wrap { grid-template-columns: 1fr; }
+    .left-panel { display: none; }
+    .right-panel { padding: 36px 24px; align-items: flex-start; padding-top: 48px; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>Skill Linkr</a>
+  <div class="nav-right">New here? <a href="register-student.html">Create account</a></div>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT -->
+  <div class="left-panel">
+    <div>
+      <div class="left-tag">Welcome Back</div>
+      <h2 class="left-title">Good to see you again.</h2>
+      <p class="left-sub">Log in and continue where you left off — projects are waiting for you.</p>
+
+      <div class="testimonial-card">
+        <p class="testi-quote">"I logged in one morning, applied to 3 projects, and got my first paid gig the same day. Skill Linkr is genuinely different."</p>
+        <div class="testi-person">
+          <div class="testi-avatar">SK</div>
+          <div>
+            <div class="testi-info-name">Sneha Kapoor</div>
+            <div class="testi-info-role">B.Tech 3rd Year, Kanpur — UI Designer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stat-strip">
+        <div><div class="s-num">500+</div><div class="s-label">Students</div></div>
+        <div><div class="s-num">120+</div><div class="s-label">Projects</div></div>
+        <div><div class="s-num">₹2L+</div><div class="s-label">Earned</div></div>
+      </div>
+    </div>
+    <div class="left-bg">LOG</div>
+  </div>
+
+  <!-- RIGHT -->
+  <div class="right-panel">
+    <div class="form-box">
+
+      <!-- Role Tabs -->
+      <div class="role-tabs">
+        <button class="role-tab active" id="tabStudent" onclick="switchRole('student')">🎓 Student</button>
+        <button class="role-tab" id="tabClient" onclick="switchRole('client')">💼 Client</button>
+      </div>
+
+      <!-- Error Banner -->
+      <div class="error-banner" id="errorBanner">
+        <span>⚠️</span>
+        <span id="errorText">Invalid email or password. Please try again.</span>
+      </div>
+
+      <!-- LOGIN FORM -->
+      <div id="loginForm">
+        <h2 class="form-title" id="formTitle">Welcome back, student!</h2>
+        <p class="form-sub" id="formSub">Log in to browse and apply for projects.</p>
+
+        <div class="form-group">
+          <label>Email Address</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" oninput="clearError()" />
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <div class="input-wrap">
+            <input type="password" id="loginPassword" placeholder="Your password" oninput="clearError()" onkeydown="if(event.key==='Enter')doLogin()" />
+            <button class="pw-toggle" type="button" onclick="togglePw()" id="pwToggle" title="Show/hide password">👁️</button>
+          </div>
+        </div>
+
+        <div class="forgot-row">
+          <a href="#" class="forgot-link" onclick="openForgot(event)">Forgot password?</a>
+        </div>
+
+        <button class="btn-login" id="loginBtn" onclick="doLogin()">
+          <span id="btnText">Log In</span>
+          <div class="spinner" id="spinner"></div>
+        </button>
+
+        <div class="or-divider"><span>or continue with</span></div>
+
+        <a href="#" class="social-btn">
+          <svg class="g-icon" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </a>
+
+        <div class="signup-prompt" id="signupPrompt">
+          Don't have an account? <a href="register-student.html" id="signupLink">Join as Student →</a>
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="login-success" id="loginSuccess">
+        <div class="success-icon">✅</div>
+        <h2 class="success-title">You're in!</h2>
+        <p class="success-sub" id="successMsg">Welcome back. Redirecting to your dashboard...</p>
+        <a href="dashboard-student.html" class="btn-go" id="dashboardLink">Go to Dashboard →</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- FORGOT PASSWORD MODAL -->
+<div class="modal-overlay" id="forgotModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeForgot()">✕</button>
+    <div id="forgotForm">
+      <h3 class="modal-title">Reset your password</h3>
+      <p class="modal-sub">Enter your registered email and we'll send you a reset link.</p>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" id="forgotEmail" placeholder="you@example.com" />
+      </div>
+      <button class="btn-login" onclick="sendReset()" style="margin-top:8px;">Send Reset Link</button>
+    </div>
+    <div class="modal-success" id="forgotSuccess">
+      <div style="font-size:2.5rem;">📬</div>
+      <p>Reset link sent! Check your inbox (and spam folder).</p>
+      <button onclick="closeForgot()" style="margin-top:16px;background:var(--accent);color:#fff;border:none;border-radius:100px;padding:10px 24px;font-family:'DM Sans',sans-serif;font-size:0.88rem;cursor:pointer;">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let role = 'student';
+  let pwVisible = false;
+
+  function switchRole(r) {
+    role = r;
+    document.getElementById('tabStudent').className = 'role-tab' + (r === 'student' ? ' active' : '');
+    document.getElementById('tabClient').className = 'role-tab' + (r === 'client' ? ' active' : '');
+    document.getElementById('formTitle').textContent = r === 'student' ? 'Welcome back, student!' : 'Welcome back!';
+    document.getElementById('formSub').textContent = r === 'student'
+      ? 'Log in to browse and apply for projects.'
+      : 'Log in to post projects and hire students.';
+    document.getElementById('signupLink').href = r === 'client' ? 'register-client.html' : 'register-student.html';
+    document.getElementById('signupLink').textContent = r === 'client' ? 'Join as Client →' : 'Join as Student →';
+    clearError();
+  }
+
+  function togglePw() {
+    pwVisible = !pwVisible;
+    const input = document.getElementById('loginPassword');
+    input.type = pwVisible ? 'text' : 'password';
+    document.getElementById('pwToggle').textContent = pwVisible ? '🙈' : '👁️';
+  }
+
+  function clearError() {
+    document.getElementById('errorBanner').classList.remove('show');
+    document.getElementById('loginEmail').classList.remove('error-field');
+    document.getElementById('loginPassword').classList.remove('error-field');
+  }
+
+  function doLogin() {
+    const email = document.getElementById('loginEmail').value.trim();
+    const pw = document.getElementById('loginPassword').value;
+    if (!email || !pw) {
+      showError('Please enter your email and password.');
+      if (!email) document.getElementById('loginEmail').classList.add('error-field');
+      if (!pw) document.getElementById('loginPassword').classList.add('error-field');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      showError('Please enter a valid email address.');
+      document.getElementById('loginEmail').classList.add('error-field');
+      return;
+    }
+
+    // Show loading
+    const btn = document.getElementById('loginBtn');
+    document.getElementById('btnText').textContent = 'Logging in...';
+    document.getElementById('spinner').style.display = 'block';
+    btn.disabled = true;
+
+    setTimeout(() => {
+      document.getElementById('spinner').style.display = 'none';
+      document.getElementById('loginForm').style.display = 'none';
+      const success = document.getElementById('loginSuccess');
+      success.style.display = 'block';
+      document.getElementById('successMsg').textContent = role === 'student'
+        ? 'Welcome back! Redirecting to your student dashboard...'
+        : 'Welcome back! Redirecting to your client dashboard...';
+      document.getElementById('dashboardLink').href = role === 'client' ? 'dashboard-client.html' : 'dashboard-student.html';
+    }, 1400);
+  }
+
+  function showError(msg) {
+    document.getElementById('errorText').textContent = msg;
+    document.getElementById('errorBanner').classList.add('show');
+  }
+
+  function openForgot(e) { e.preventDefault(); document.getElementById('forgotModal').classList.add('open'); }
+  function closeForgot() {
+    document.getElementById('forgotModal').classList.remove('open');
+    document.getElementById('forgotForm').style.display = 'block';
+    document.getElementById('forgotSuccess').style.display = 'none';
+    document.getElementById('forgotEmail').value = '';
+  }
+  function sendReset() {
+    const email = document.getElementById('forgotEmail').value.trim();
+    if (!email) { document.getElementById('forgotEmail').style.borderColor = 'var(--error)'; return; }
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('forgotSuccess').style.display = 'block';
+  }
+
+  document.getElementById('forgotModal').addEventListener('click', function(e) {
+    if (e.target === this) closeForgot();
+  });
+</script>
+</body>
+</html>

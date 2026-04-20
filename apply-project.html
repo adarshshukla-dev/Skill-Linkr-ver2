@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Apply to Project — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --accent2: #1a1a6e; --accent2-light: #eeeeff;
+    --border: #e2ddd6; --green: #1d6f42; --green-light: #e8f5ee;
+    --error: #dc2626; --error-light: #fef2f2;
+  }
+  html { scroll-behavior: smooth; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 5%; border-bottom: 1px solid var(--border); background: rgba(245,242,235,0.95); backdrop-filter: blur(10px); position: sticky; top: 0; z-index: 50; }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .page-wrap { display: grid; grid-template-columns: 1fr 360px; gap: 24px; max-width: 1100px; margin: 0 auto; padding: 36px 5% 64px; }
+
+  /* PROJECT SUMMARY CARD */
+  .proj-summary { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+  .proj-cat { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: var(--accent); margin-bottom: 6px; }
+  .proj-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 800; color: var(--ink); margin-bottom: 6px; }
+  .proj-company { font-size: 0.83rem; color: var(--muted); margin-bottom: 16px; display: flex; align-items: center; gap: 6px; }
+  .vdot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); }
+  .proj-desc { font-size: 0.9rem; color: var(--ink2); line-height: 1.75; font-weight: 300; margin-bottom: 16px; }
+  .proj-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .info-chip { background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+  .ic-label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 3px; }
+  .ic-val { font-size: 0.88rem; font-weight: 500; color: var(--ink); }
+
+  /* FORM */
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+  .form-title { font-family: 'Syne', sans-serif; font-size: 1.2rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .form-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; font-weight: 300; }
+  .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.82rem; font-weight: 500; color: var(--ink2); }
+  label .req { color: var(--accent); }
+  label .hint { font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
+  input, select, textarea {
+    width: 100%; padding: 11px 14px; border: 1.5px solid var(--border);
+    border-radius: 10px; background: var(--bg); color: var(--ink);
+    font-family: 'DM Sans', sans-serif; font-size: 0.92rem;
+    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+  }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent); background: var(--surface); box-shadow: 0 0 0 3px rgba(255,92,26,0.07); }
+  input.err { border-color: var(--error); background: var(--error-light); }
+  .err-msg { font-size: 0.77rem; color: var(--error); display: none; }
+  .err-msg.show { display: block; }
+  textarea { resize: vertical; min-height: 140px; line-height: 1.6; }
+  select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%236b6b6b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+  /* BID DISPLAY */
+  .bid-preview { background: var(--accent-light); border: 1.5px solid #ffd0b8; border-radius: 10px; padding: 14px 16px; margin-top: 6px; display: flex; align-items: center; justify-content: space-between; }
+  .bid-num { font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+  .bid-note { font-size: 0.75rem; color: var(--muted); }
+
+  /* MILESTONES */
+  .milestones-wrap { border: 1.5px solid var(--border); border-radius: 10px; overflow: hidden; }
+  .milestone-row { display: grid; grid-template-columns: 1fr 80px 32px; gap: 8px; padding: 10px 12px; border-bottom: 1px solid var(--border); align-items: center; background: var(--surface); }
+  .milestone-row:last-child { border-bottom: none; }
+  .ms-input { padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 0.85rem; background: var(--bg); }
+  .ms-input:focus { border-color: var(--accent); outline: none; }
+  .ms-days { padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 7px; font-size: 0.85rem; background: var(--bg); text-align: center; }
+  .ms-days:focus { border-color: var(--accent); outline: none; }
+  .btn-rm-ms { width: 28px; height: 28px; border: none; background: var(--error-light); color: var(--error); border-radius: 6px; cursor: pointer; font-size: 1rem; display: flex; align-items: center; justify-content: center; }
+  .btn-add-ms { display: flex; align-items: center; gap: 6px; background: none; border: none; color: var(--accent); font-size: 0.82rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; padding: 10px 12px; }
+  .btn-add-ms:hover { text-decoration: underline; }
+
+  /* CHAR COUNT */
+  .char-count { font-size: 0.75rem; color: var(--muted); text-align: right; margin-top: 3px; }
+
+  /* SUBMIT */
+  .btn-submit { width: 100%; background: var(--accent); color: #fff; border: none; border-radius: 100px; padding: 14px; font-size: 0.95rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: transform 0.15s, box-shadow 0.15s; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+  .btn-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255,92,26,0.3); }
+  .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+  .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* SIDEBAR */
+  .sidebar-sticky { position: sticky; top: 80px; display: flex; flex-direction: column; gap: 16px; }
+  .tip-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .tip-title { font-family: 'Syne', sans-serif; font-size: 0.88rem; font-weight: 700; color: var(--ink); margin-bottom: 12px; }
+  .tip-item { display: flex; gap: 8px; font-size: 0.82rem; color: var(--ink2); line-height: 1.55; margin-bottom: 10px; }
+  .tip-item:last-child { margin-bottom: 0; }
+  .tip-dot { color: var(--accent); font-weight: 700; flex-shrink: 0; }
+  .collab-card { background: var(--accent2); color: #fff; border-radius: 14px; padding: 20px; }
+  .collab-card h4 { font-family: 'Syne', sans-serif; font-size: 0.92rem; font-weight: 700; margin-bottom: 6px; }
+  .collab-card p { font-size: 0.8rem; color: rgba(255,255,255,0.6); line-height: 1.6; margin-bottom: 14px; font-weight: 300; }
+  .btn-collab { display: block; text-align: center; background: rgba(255,255,255,0.12); color: #fff; border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; padding: 9px; font-size: 0.82rem; font-weight: 500; text-decoration: none; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: background 0.2s; }
+  .btn-collab:hover { background: rgba(255,255,255,0.22); }
+
+  /* SUCCESS */
+  .success-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+  .success-overlay.open { display: flex; }
+  .success-box { background: var(--surface); border-radius: 20px; padding: 40px 36px; max-width: 420px; width: 90%; text-align: center; animation: popIn 0.25s ease; }
+  @keyframes popIn { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .s-icon { font-size: 2.8rem; margin-bottom: 14px; }
+  .s-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--ink); margin-bottom: 8px; }
+  .s-sub { font-size: 0.88rem; color: var(--muted); line-height: 1.7; margin-bottom: 24px; }
+  .btn-go { display: inline-block; background: var(--ink); color: #fff; border-radius: 100px; padding: 12px 28px; font-size: 0.9rem; font-weight: 500; text-decoration: none; font-family: 'DM Sans', sans-serif; }
+
+  @media (max-width: 780px) { .page-wrap { grid-template-columns: 1fr; } .sidebar-sticky { position: static; } .form-row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>Skill Linkr</a>
+  <a href="projects.html" style="font-size:0.88rem;color:var(--muted);text-decoration:none;">← Back to Projects</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- LEFT: Project Info + Form -->
+  <div>
+    <!-- Project Summary -->
+    <div class="proj-summary">
+      <div class="proj-cat" id="projCat">Design</div>
+      <div class="proj-title" id="projTitle">Brand Identity Design for EdTech Startup</div>
+      <div class="proj-company"><span class="vdot"></span><span id="projCompany">LearnFast India · Noida, UP</span></div>
+      <div class="proj-desc" id="projDesc">We need a complete brand identity — logo, color palette, typography guide, and basic brand book for our new EdTech platform targeting college students in tier-2 cities.</div>
+      <div class="proj-info-grid">
+        <div class="info-chip"><div class="ic-label">Client Budget</div><div class="ic-val" id="projBudget" style="color:var(--accent);font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;">₹8,000</div></div>
+        <div class="info-chip"><div class="ic-label">Deadline</div><div class="ic-val" id="projDeadline">Within 5 days</div></div>
+        <div class="info-chip"><div class="ic-label">Work Mode</div><div class="ic-val">🌐 Remote</div></div>
+        <div class="info-chip"><div class="ic-label">Category</div><div class="ic-val" id="projCat2">Design</div></div>
+      </div>
+    </div>
+
+    <!-- Bid Form -->
+    <div class="form-card">
+      <div class="form-title">Submit Your Proposal</div>
+      <div class="form-sub">Write a strong proposal — clients read every word. Be specific and professional.</div>
+
+      <!-- Bid Amount -->
+      <div class="form-group">
+        <label>Your Bid Amount <span class="req">*</span> <span class="hint">(What will you charge?)</span></label>
+        <input type="number" id="bidAmount" placeholder="e.g. 7500" min="100" oninput="updateBidPreview(this.value)" />
+        <div class="bid-preview" id="bidPreview" style="display:none;">
+          <div>
+            <div class="bid-num" id="bidDisplay">₹0</div>
+            <div class="bid-note">Your proposed price</div>
+          </div>
+          <div style="font-size:0.8rem;color:var(--muted);text-align:right;">Client budget:<br><b style="color:var(--ink);">₹8,000</b></div>
+        </div>
+        <span class="err-msg" id="e-bid">Please enter your bid amount</span>
+      </div>
+
+      <!-- Timeline -->
+      <div class="form-row">
+        <div class="form-group">
+          <label>How many days will you take? <span class="req">*</span></label>
+          <input type="number" id="proposedDays" placeholder="e.g. 4" min="1" max="365" />
+          <span class="err-msg" id="e-days">Please enter number of days</span>
+        </div>
+        <div class="form-group">
+          <label>When can you start?</label>
+          <select id="startWhen">
+            <option>Immediately</option>
+            <option>Within 24 hours</option>
+            <option>Within 2–3 days</option>
+            <option>Next week</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Cover Letter -->
+      <div class="form-group">
+        <label>Your Proposal / Cover Letter <span class="req">*</span></label>
+        <textarea id="coverLetter" placeholder="Dear Client,&#10;&#10;I have carefully read your project requirements and I am confident I can deliver excellent results...&#10;&#10;Explain:&#10;• Why you're the right person&#10;• Your relevant experience or projects&#10;• How you'll approach this work&#10;• Any questions you have" maxlength="1500" oninput="updateCharCount(this)"></textarea>
+        <div class="char-count" id="charCount">0 / 1500</div>
+        <span class="err-msg" id="e-cover">Please write a proposal (min 100 characters)</span>
+      </div>
+
+      <!-- Milestones (optional) -->
+      <div class="form-group">
+        <label>Project Milestones <span class="hint">(optional — helps build trust)</span></label>
+        <div class="milestones-wrap" id="milestonesWrap">
+          <div class="milestone-row" style="background:var(--bg);border-bottom:1px solid var(--border);padding:8px 12px;">
+            <div style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Milestone</div>
+            <div style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;">Days</div>
+            <div></div>
+          </div>
+          <div id="milestoneRows"></div>
+        </div>
+        <button type="button" class="btn-add-ms" onclick="addMilestone()">+ Add Milestone</button>
+      </div>
+
+      <button class="btn-submit" id="submitBtn" onclick="submitBid()">
+        <span id="btnText">Submit Proposal →</span>
+        <div class="spinner" id="spinner"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- RIGHT SIDEBAR -->
+  <div class="sidebar-sticky">
+    <div class="tip-card">
+      <div class="tip-title">✍️ Tips for a winning proposal</div>
+      <div class="tip-item"><span class="tip-dot">→</span>Address the client by their company name</div>
+      <div class="tip-item"><span class="tip-dot">→</span>Mention 1–2 similar projects you've done</div>
+      <div class="tip-item"><span class="tip-dot">→</span>Be specific about your approach, not just "I'll do it"</div>
+      <div class="tip-item"><span class="tip-dot">→</span>Ask 1 smart question about their project</div>
+      <div class="tip-item"><span class="tip-dot">→</span>Keep your bid realistic — don't just bid lowest</div>
+      <div class="tip-item"><span class="tip-dot">→</span>Add milestones to show you're organized</div>
+    </div>
+
+    <div class="collab-card">
+      <h4>🤝 Need help on this project?</h4>
+      <p>You can invite another student to collaborate after submitting your proposal. Share the work, share the payment.</p>
+      <a href="collaboration.html" class="btn-collab">Find a Collaborator →</a>
+    </div>
+
+    <div class="tip-card" style="background:var(--green-light);border-color:#86efac;">
+      <div class="tip-title" style="color:var(--green);">🔒 Secure Payment</div>
+      <div style="font-size:0.82rem;color:var(--green);font-weight:300;line-height:1.6;">Payment is held in escrow by Skill Linkr and only released to you after the client approves your work. You are always protected.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="s-icon">🎉</div>
+    <div class="s-title">Proposal Submitted!</div>
+    <div class="s-sub">Your bid has been sent to the client. You'll be notified when they respond — usually within 24–48 hours.</div>
+    <a href="dashboard-student.html" class="btn-go">Go to My Dashboard →</a>
+  </div>
+</div>
+
+<script>
+  let milestoneCount = 0;
+
+  function updateBidPreview(val) {
+    const preview = document.getElementById('bidPreview');
+    const display = document.getElementById('bidDisplay');
+    if (val && parseInt(val) > 0) {
+      preview.style.display = 'flex';
+      display.textContent = '₹' + parseInt(val).toLocaleString('en-IN');
+    } else {
+      preview.style.display = 'none';
+    }
+  }
+
+  function updateCharCount(el) {
+    document.getElementById('charCount').textContent = el.value.length + ' / 1500';
+  }
+
+  function addMilestone() {
+    milestoneCount++;
+    const row = document.createElement('div');
+    row.className = 'milestone-row';
+    row.id = 'ms-' + milestoneCount;
+    row.innerHTML = `
+      <input class="ms-input" type="text" placeholder="e.g. Deliver logo concepts" style="width:100%;border:1.5px solid var(--border);"/>
+      <input class="ms-days" type="number" placeholder="Days" min="1"/>
+      <button class="btn-rm-ms" onclick="removeMilestone(${milestoneCount})" title="Remove">✕</button>
+    `;
+    document.getElementById('milestoneRows').appendChild(row);
+  }
+
+  function removeMilestone(id) {
+    const el = document.getElementById('ms-' + id);
+    if (el) el.remove();
+  }
+
+  function getMilestones() {
+    const rows = document.querySelectorAll('#milestoneRows .milestone-row');
+    return Array.from(rows).map(row => ({
+      title: row.querySelector('input[type="text"]').value,
+      days: parseInt(row.querySelector('input[type="number"]').value) || 0,
+    })).filter(m => m.title.trim());
+  }
+
+  function setErr(id, errId, bad) {
+    const el = document.getElementById(id);
+    const em = document.getElementById(errId);
+    if (bad) { if(el) el.classList.add('err'); if(em) em.classList.add('show'); }
+    else { if(el) el.classList.remove('err'); if(em) em.classList.remove('show'); }
+    return !bad;
+  }
+
+  function submitBid() {
+    const bid = document.getElementById('bidAmount').value;
+    const days = document.getElementById('proposedDays').value;
+    const cover = document.getElementById('coverLetter').value;
+
+    let ok = true;
+    ok = setErr('bidAmount', 'e-bid', !bid || parseInt(bid) < 1) && ok;
+    ok = setErr('proposedDays', 'e-days', !days || parseInt(days) < 1) && ok;
+    ok = setErr('coverLetter', 'e-cover', cover.trim().length < 100) && ok;
+    if (!ok) return;
+
+    // Show loading
+    document.getElementById('btnText').textContent = 'Submitting...';
+    document.getElementById('spinner').style.display = 'block';
+    document.getElementById('submitBtn').disabled = true;
+
+    // ── CONNECT TO BACKEND ──
+    // Uncomment after backend is deployed:
+    // const projectId = new URLSearchParams(window.location.search).get('id');
+    // applyToProject(projectId, {
+    //   bidAmount: parseInt(bid),
+    //   proposedDays: parseInt(days),
+    //   coverLetter: cover,
+    //   milestones: getMilestones(),
+    // }).then(() => {
+    //   document.getElementById('successOverlay').classList.add('open');
+    // }).catch(err => alert(err.message));
+
+    setTimeout(() => {
+      document.getElementById('successOverlay').classList.add('open');
+    }, 1200);
+  }
+</script>
+</body>
+</html>
