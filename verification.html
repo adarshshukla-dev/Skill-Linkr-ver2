@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>College Verification — Skill Linkr</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #0d0d0d; --ink2: #2a2a2a; --muted: #6b6b6b;
+    --bg: #f5f2eb; --surface: #ffffff;
+    --accent: #ff5c1a; --accent-light: #fff3ee;
+    --accent2: #1a1a6e; --accent2-light: #eeeeff;
+    --border: #e2ddd6; --green: #1d6f42; --green-light: #e8f5ee;
+    --amber: #b45309; --amber-light: #fffbeb;
+  }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; }
+
+  nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 5%; border-bottom: 1px solid var(--border); background: rgba(245,242,235,0.95); backdrop-filter: blur(10px); }
+  .nav-logo { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; color: var(--ink); text-decoration: none; display: flex; align-items: center; gap: 8px; }
+  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+
+  .page-wrap { max-width: 700px; margin: 0 auto; padding: 40px 5% 64px; }
+
+  /* STATUS BANNER */
+  .status-banner { border-radius: 14px; padding: 20px 24px; margin-bottom: 28px; display: flex; align-items: center; gap: 16px; }
+  .sb-unverified { background: var(--amber-light); border: 1px solid #fcd34d; }
+  .sb-pending    { background: var(--accent2-light); border: 1px solid #a5b4fc; }
+  .sb-verified   { background: var(--green-light); border: 1px solid #86efac; }
+  .sb-rejected   { background: #fef2f2; border: 1px solid #fca5a5; }
+  .sb-icon { font-size: 1.8rem; flex-shrink: 0; }
+  .sb-title { font-family: 'Syne', sans-serif; font-size: 0.95rem; font-weight: 700; margin-bottom: 3px; }
+  .sb-sub { font-size: 0.82rem; font-weight: 300; line-height: 1.5; color: var(--muted); }
+
+  /* WHY VERIFY */
+  .why-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 28px; }
+  .why-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+  .why-icon { font-size: 1.3rem; margin-bottom: 8px; }
+  .why-title { font-size: 0.85rem; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+  .why-desc { font-size: 0.78rem; color: var(--muted); line-height: 1.5; font-weight: 300; }
+
+  /* FORM */
+  .form-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 28px; }
+  .form-title { font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--ink); margin-bottom: 4px; }
+  .form-sub { font-size: 0.85rem; color: var(--muted); margin-bottom: 24px; line-height: 1.6; }
+  .form-group { margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px; }
+  label { font-size: 0.82rem; font-weight: 500; color: var(--ink2); }
+  .opt { font-size: 0.75rem; color: var(--muted); font-weight: 400; margin-left: 4px; }
+  input, select { width: 100%; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--ink); font-family: 'DM Sans', sans-serif; font-size: 0.92rem; outline: none; transition: border-color 0.2s; }
+  input:focus, select:focus { border-color: var(--accent2); background: var(--surface); }
+
+  /* UPLOAD */
+  .upload-box { border: 2px dashed var(--border); border-radius: 12px; padding: 32px; text-align: center; cursor: pointer; transition: border-color 0.2s, background 0.2s; position: relative; }
+  .upload-box:hover { border-color: var(--accent2); background: var(--accent2-light); }
+  .upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+  .upload-text { font-size: 0.85rem; color: var(--muted); line-height: 1.6; }
+  .upload-text b { color: var(--accent2); }
+  .file-chosen { font-size: 0.82rem; color: var(--green); margin-top: 8px; display: none; }
+
+  /* ACCEPTED DOCS */
+  .accepted-docs { background: var(--bg); border-radius: 10px; padding: 14px 16px; margin-top: 8px; }
+  .ad-title { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 8px; }
+  .ad-list { display: flex; flex-wrap: wrap; gap: 6px; }
+  .ad-tag { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; font-size: 0.77rem; color: var(--ink2); }
+
+  /* OR DIVIDER */
+  .or-div { display: flex; align-items: center; gap: 12px; margin: 20px 0; }
+  .or-div::before, .or-div::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .or-div span { font-size: 0.78rem; color: var(--muted); }
+
+  /* SUBMIT */
+  .btn-verify { width: 100%; background: var(--accent2); color: #fff; border: none; border-radius: 100px; padding: 13px; font-size: 0.95rem; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: opacity 0.2s; margin-top: 8px; }
+  .btn-verify:hover { opacity: 0.88; }
+
+  /* PRIVACY NOTE */
+  .privacy-note { display: flex; gap: 10px; background: var(--bg); border-radius: 10px; padding: 12px 16px; margin-top: 16px; font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+
+  @media (max-width: 500px) { .why-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo"><span class="logo-dot"></span>Skill Linkr</a>
+  <a href="dashboard-student.html" style="font-size:0.88rem;color:var(--muted);text-decoration:none;">← Dashboard</a>
+</nav>
+
+<div class="page-wrap">
+
+  <!-- Dynamic Status Banner -->
+  <div class="status-banner sb-unverified" id="statusBanner">
+    <div class="sb-icon">📋</div>
+    <div>
+      <div class="sb-title">Your account is not verified yet</div>
+      <div class="sb-sub">Submit your college ID to get the ✓ Verified badge. Verified students get 3× more client views.</div>
+    </div>
+  </div>
+
+  <!-- Why Verify -->
+  <div class="why-grid">
+    <div class="why-card">
+      <div class="why-icon">⭐</div>
+      <div class="why-title">3× more profile views</div>
+      <div class="why-desc">Clients trust verified students. Verified profiles appear higher in search results.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🤝</div>
+      <div class="why-title">Access collaboration</div>
+      <div class="why-desc">Only verified students can send and receive collaboration invites for projects.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">💼</div>
+      <div class="why-title">Apply to premium projects</div>
+      <div class="why-desc">Some high-paying clients only accept applications from verified students.</div>
+    </div>
+    <div class="why-card">
+      <div class="why-icon">🔒</div>
+      <div class="why-title">Build trust instantly</div>
+      <div class="why-desc">A verified badge shows clients you're a real, enrolled college student.</div>
+    </div>
+  </div>
+
+  <!-- Verification Form -->
+  <div class="form-card" id="verifyForm">
+    <div class="form-title">Submit for Verification</div>
+    <div class="form-sub">We verify within 24 hours. Your documents are kept private and never shared with clients.</div>
+
+    <!-- College ID Upload -->
+    <div class="form-group">
+      <label>Upload College ID / Enrollment Card <span style="color:var(--accent);">*</span></label>
+      <div class="upload-box">
+        <input type="file" accept="image/*,.pdf" onchange="handleUpload(this)" />
+        <div class="upload-icon">🪪</div>
+        <div class="upload-text">Drag & drop or <b>browse</b> to upload<br>JPG, PNG or PDF · Max 5MB</div>
+        <div class="file-chosen" id="fileName"></div>
+      </div>
+      <div class="accepted-docs">
+        <div class="ad-title">Accepted documents</div>
+        <div class="ad-list">
+          <span class="ad-tag">College ID Card</span>
+          <span class="ad-tag">Enrollment Letter</span>
+          <span class="ad-tag">Fee Receipt</span>
+          <span class="ad-tag">Admit Card</span>
+          <span class="ad-tag">Bonafide Certificate</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="or-div"><span>and / or</span></div>
+
+    <!-- College Email -->
+    <div class="form-group">
+      <label>College Email Address <span class="opt">(if your college provides one)</span></label>
+      <input type="email" id="collegeEmail" placeholder="yourname@yourcollegename.ac.in" />
+      <div style="font-size:0.77rem;color:var(--muted);margin-top:4px;">We'll send a verification link to this email.</div>
+    </div>
+
+    <!-- Enrollment Number -->
+    <div class="form-group">
+      <label>Enrollment / Registration Number <span class="opt">(optional)</span></label>
+      <input type="text" id="enrollNo" placeholder="e.g. 2100140XXXXX" />
+    </div>
+
+    <!-- College Name -->
+    <div class="form-group">
+      <label>College / University Name</label>
+      <input type="text" id="collegeName" placeholder="e.g. AKTU Lucknow, Agra University" />
+    </div>
+
+    <button class="btn-verify" onclick="submitVerification()">Submit for Verification →</button>
+
+    <div class="privacy-note">
+      🔒 Your documents are reviewed only by Skill Linkr staff and are never shared with clients or third parties. We comply with Indian data protection guidelines.
+    </div>
+  </div>
+
+  <!-- PENDING STATE (shown after submit) -->
+  <div id="pendingState" style="display:none;background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:40px;text-align:center;">
+    <div style="font-size:2.5rem;margin-bottom:14px;">⏳</div>
+    <div style="font-family:'Syne',sans-serif;font-size:1.2rem;font-weight:800;color:var(--ink);margin-bottom:8px;">Verification Submitted!</div>
+    <div style="font-size:0.9rem;color:var(--muted);line-height:1.7;max-width:380px;margin:0 auto 24px;">Our team will review your documents within 24 hours. You'll receive a notification once verified.</div>
+    <a href="dashboard-student.html" style="display:inline-block;background:var(--accent2);color:#fff;border-radius:100px;padding:12px 28px;font-size:0.9rem;font-weight:500;text-decoration:none;font-family:'DM Sans',sans-serif;">Back to Dashboard</a>
+  </div>
+
+</div>
+
+<script>
+  function handleUpload(input) {
+    if (input.files && input.files[0]) {
+      const fn = document.getElementById('fileName');
+      fn.textContent = '✓ ' + input.files[0].name;
+      fn.style.display = 'block';
+    }
+  }
+
+  function submitVerification() {
+    const hasFile = document.getElementById('fileName').style.display !== 'none' && document.getElementById('fileName').textContent;
+    const hasEmail = document.getElementById('collegeEmail').value.trim();
+    if (!hasFile && !hasEmail) {
+      alert('Please upload your college ID or enter your college email to proceed.');
+      return;
+    }
+
+    // Show pending state
+    document.getElementById('verifyForm').style.display = 'none';
+    document.getElementById('pendingState').style.display = 'block';
+    document.getElementById('statusBanner').className = 'status-banner sb-pending';
+    document.getElementById('statusBanner').innerHTML = `
+      <div class="sb-icon">⏳</div>
+      <div>
+        <div class="sb-title" style="color:var(--accent2);">Verification Pending</div>
+        <div class="sb-sub">Your documents are under review. Usually takes less than 24 hours.</div>
+      </div>
+    `;
+
+    // Real app: call API
+    // apiFetch('/api/verification/submit', { method: 'POST', body: JSON.stringify({ collegeIdImageUrl: '...', collegeEmail, enrollNo }) })
+  }
+</script>
+</body>
+</html>
